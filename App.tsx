@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Printer, MapPin, Phone, Mail, ChevronLeft, CalendarDays, Download, Upload, 
   CheckCircle, AlertCircle, X, ClipboardList, IdCard, Plus, Trash2, Paperclip, 
-  FileImage, FileText, FileSpreadsheet, File, FolderOpen 
+  FileImage, FileText, FileSpreadsheet, File, FolderOpen, Save
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { ActiveCardRow, RecipientRow } from './types';
@@ -26,9 +26,10 @@ interface ActiveCardsPageProps {
   rows: ActiveCardRow[];
   setRows: React.Dispatch<React.SetStateAction<ActiveCardRow[]>>;
   onShowToast: (message: string, type: 'success' | 'error') => void;
+  onSave: () => void;
 }
 
-const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShowToast }) => {
+const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShowToast, onSave }) => {
   const tableRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
@@ -103,10 +104,14 @@ const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShow
         <h2 className="text-2xl font-bold">بطاقات الزوار الفعالة</h2>
       </div>
 
-      <div className="mb-4 mt-2 flex justify-start no-print print:hidden">
+      <div className="mb-4 mt-2 flex justify-start gap-2 no-print print:hidden">
         <button onClick={handleAddRow} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
           <Plus size={18} />
           <span>إضافة صف جديد</span>
+        </button>
+        <button onClick={onSave} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
+          <Save size={18} />
+          <span>حفظ التغييرات</span>
         </button>
       </div>
 
@@ -176,9 +181,10 @@ interface RecipientsPageProps {
   rows: RecipientRow[];
   setRows: React.Dispatch<React.SetStateAction<RecipientRow[]>>;
   onShowToast: (message: string, type: 'success' | 'error') => void;
+  onSave: () => void;
 }
 
-const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowToast }) => {
+const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowToast, onSave }) => {
   const tableRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
@@ -257,10 +263,14 @@ const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowTo
         <h2 className="text-xl font-bold">كشف المستلمين للبطاقات</h2>
       </div>
 
-      <div className="mb-4 mt-2 flex justify-start no-print print:hidden">
+      <div className="mb-4 mt-2 flex justify-start gap-2 no-print print:hidden">
         <button onClick={handleAddRow} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
           <Plus size={18} />
           <span>إضافة صف جديد</span>
+        </button>
+        <button onClick={onSave} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
+          <Save size={18} />
+          <span>حفظ التغييرات</span>
         </button>
       </div>
 
@@ -378,6 +388,53 @@ const App: React.FC = () => {
   const [recipientRows, setRecipientRows] = useState<RecipientRow[]>(INITIAL_RECIPIENT_ROWS);
   const [toast, setToast] = useState<Toast | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isInitialMount = useRef(true);
+
+  // Load data from localStorage on initial render
+  useEffect(() => {
+    try {
+      const savedActive = localStorage.getItem('saaed-active-cards');
+      if (savedActive) {
+        const parsedActive = JSON.parse(savedActive);
+        // Add back null for attachment as File object cannot be stored
+        const restoredActive = parsedActive.map((row: Omit<ActiveCardRow, 'attachment'>) => ({ ...row, attachment: null }));
+        setActiveRows(restoredActive);
+      }
+
+      const savedRecipients = localStorage.getItem('saaed-recipient-cards');
+      if (savedRecipients) {
+        const parsedRecipients = JSON.parse(savedRecipients);
+        const restoredRecipients = parsedRecipients.map((row: Omit<RecipientRow, 'attachment'>) => ({ ...row, attachment: null }));
+        setRecipientRows(restoredRecipients);
+      }
+    } catch (error) {
+      console.error("Failed to load data from localStorage", error);
+      showToast("فشل تحميل البيانات المحفوظة", "error");
+    }
+  }, []); // Empty array ensures this runs only once on mount
+
+  // Auto-save data on change
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
+    const autoSaveChanges = () => {
+      try {
+        const serializableActiveRows = activeRows.map(({ attachment, ...rest }) => rest);
+        const serializableRecipientRows = recipientRows.map(({ attachment, ...rest }) => rest);
+
+        localStorage.setItem('saaed-active-cards', JSON.stringify(serializableActiveRows));
+        localStorage.setItem('saaed-recipient-cards', JSON.stringify(serializableRecipientRows));
+      } catch (error) {
+        console.error("Failed to auto-save data to localStorage", error);
+        showToast("فشل الحفظ التلقائي", "error");
+      }
+    };
+    
+    autoSaveChanges();
+  }, [activeRows, recipientRows]);
 
   useEffect(() => {
     const date = new Date();
@@ -395,6 +452,22 @@ const App: React.FC = () => {
   const handlePrint = () => {
     window.print();
   };
+  
+  // --- Manual Save Logic ---
+  const handleSave = () => {
+    try {
+      const serializableActiveRows = activeRows.map(({ attachment, ...rest }) => rest);
+      const serializableRecipientRows = recipientRows.map(({ attachment, ...rest }) => rest);
+
+      localStorage.setItem('saaed-active-cards', JSON.stringify(serializableActiveRows));
+      localStorage.setItem('saaed-recipient-cards', JSON.stringify(serializableRecipientRows));
+      showToast("تم حفظ التغييرات بنجاح", "success");
+    } catch (error) {
+      console.error("Failed to save data to localStorage", error);
+      showToast("حدث خطأ أثناء حفظ البيانات", "error");
+    }
+  };
+
 
   // --- Excel Export Logic ---
   const handleExport = () => {
@@ -597,6 +670,7 @@ const App: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <input type="file" ref={fileInputRef} onChange={handleFileImport} className="hidden" accept=".xlsx, .xls" />
+            
             <button onClick={triggerImport} className="flex flex-row-reverse items-center justify-center gap-2 bg-[#091526] text-white px-5 py-2.5 rounded-lg hover:bg-[#0f2038] transition-all shadow-md hover:shadow-lg active:scale-95 border border-blue-900/50" title="استيراد من Excel">
               <Upload size={18} /><span>استيراد</span>
             </button>
@@ -613,10 +687,10 @@ const App: React.FC = () => {
       {/* Main Content Area */}
       <main className="w-full flex justify-center px-4 flex-grow print:px-0 print:w-full">
         {currentTab === Tab.ACTIVE_CARDS ? (
-          <ActiveCardsPage rows={activeRows} setRows={setActiveRows} onShowToast={showToast} />
+          <ActiveCardsPage rows={activeRows} setRows={setActiveRows} onShowToast={showToast} onSave={handleSave} />
         ) : (
           <div className="overflow-x-auto print:overflow-visible w-full flex justify-center">
-             <RecipientsPage rows={recipientRows} setRows={setRecipientRows} onShowToast={showToast} />
+             <RecipientsPage rows={recipientRows} setRows={setRecipientRows} onShowToast={showToast} onSave={handleSave} />
           </div>
         )}
       </main>
