@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Printer, MapPin, Phone, Mail, ChevronLeft, CalendarDays, Download, Upload, 
   CheckCircle, AlertCircle, X, ClipboardList, IdCard, Plus, Trash2, Paperclip, 
-  FileImage, FileText, FileSpreadsheet, File, FolderOpen, Save
+  FileImage, FileText, FileSpreadsheet, File, FolderOpen, Save, LayoutDashboard,
+  Users, BarChart3, PieChart, TrendingUp, Activity, Building
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { ActiveCardRow, RecipientRow } from './types';
 
 // --- Types & Enums ---
 enum Tab {
+  DASHBOARD = 'DASHBOARD',
   ACTIVE_CARDS = 'ACTIVE_CARDS',
   RECIPIENTS = 'RECIPIENTS'
 }
@@ -21,7 +23,215 @@ interface Toast {
 
 // --- Helper Components ---
 
-// 1. Active Cards Page Component
+// 1. Dashboard Component
+interface DashboardProps {
+  activeRows: ActiveCardRow[];
+  recipientRows: RecipientRow[];
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ activeRows, recipientRows }) => {
+  // Calculations
+  const validRecipients = recipientRows.filter(r => r.recipientName.trim() !== '');
+  const validActiveCards = activeRows.filter(r => r.cardNumber.trim() !== '' || r.cardType.trim() !== '');
+  
+  const totalRecipients = validRecipients.length;
+  const totalActiveCards = validActiveCards.length;
+  const totalAttachments = [...validRecipients, ...validActiveCards].filter(r => r.attachment !== null).length;
+  
+  // Department Stats
+  const deptCounts: Record<string, number> = {};
+  validRecipients.forEach(r => {
+    const dept = r.department.trim() || 'غير محدد';
+    deptCounts[dept] = (deptCounts[dept] || 0) + 1;
+  });
+  const sortedDepts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  // Card Type Stats
+  const typeCounts: Record<string, number> = {};
+  [...validRecipients, ...validActiveCards].forEach(r => {
+    const type = r.cardType.trim() || 'غير محدد';
+    typeCounts[type] = (typeCounts[type] || 0) + 1;
+  });
+  const sortedTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const maxTypeCount = Math.max(...Object.values(typeCounts), 1);
+
+  // Recent Activity (Last 5 recipients)
+  const recentRecipients = [...validRecipients].sort((a, b) => b.id - a.id).slice(0, 5);
+
+  return (
+    <div className="w-full max-w-7xl mx-auto p-6 space-y-8 animate-fade-in">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        {/* Card 1: Recipients - Blue Theme */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-blue-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-cyan-500"></div>
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm font-bold mb-1">إجمالي المستلمين</p>
+              <h3 className="text-4xl font-black text-blue-800">{totalRecipients}</h3>
+            </div>
+            <div className="p-3 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors shadow-sm">
+              <Users className="text-blue-600" size={24} />
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
+            <TrendingUp size={12} className="text-blue-500" />
+            <span>يتم تحديث البيانات تلقائياً</span>
+          </p>
+        </div>
+
+        {/* Card 2: Active Cards - Emerald Theme */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-emerald-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600 to-teal-500"></div>
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm font-bold mb-1">البطاقات الفعالة</p>
+              <h3 className="text-4xl font-black text-emerald-800">{totalActiveCards}</h3>
+            </div>
+            <div className="p-3 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors shadow-sm">
+              <IdCard className="text-emerald-600" size={24} />
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
+            <Activity size={12} className="text-emerald-600" />
+            <span>بطاقات قيد الاستخدام حالياً</span>
+          </p>
+        </div>
+
+        {/* Card 3: Attachments - Purple Theme */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-purple-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-fuchsia-500"></div>
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm font-bold mb-1">المرفقات المؤرشفة</p>
+              <h3 className="text-4xl font-black text-purple-800">{totalAttachments}</h3>
+            </div>
+            <div className="p-3 bg-purple-50 rounded-xl group-hover:bg-purple-100 transition-colors shadow-sm">
+              <Paperclip className="text-purple-600" size={24} />
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
+            <FileText size={12} className="text-purple-500" />
+            <span>ملفات وصور محفوظة</span>
+          </p>
+        </div>
+
+        {/* Card 4: Departments - Orange Theme */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-orange-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-amber-400"></div>
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-gray-500 text-sm font-bold mb-1">الإدارات المسجلة</p>
+              <h3 className="text-4xl font-black text-orange-800">{Object.keys(deptCounts).length}</h3>
+            </div>
+            <div className="p-3 bg-orange-50 rounded-xl group-hover:bg-orange-100 transition-colors shadow-sm">
+              <Building className="text-orange-600" size={24} />
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
+            <BarChart3 size={12} className="text-orange-500" />
+            <span>تنوع في الجهات المستفيدة</span>
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Charts Section - Types */}
+        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+             <h3 className="text-lg font-bold text-[#091526] flex items-center gap-2">
+               <PieChart size={20} className="text-[#eab308]" />
+               توزيع أنواع البطاقات
+             </h3>
+          </div>
+          <div className="space-y-4">
+            {sortedTypes.length > 0 ? sortedTypes.map(([type, count], idx) => (
+              <div key={idx} className="relative">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-semibold text-gray-700">{type}</span>
+                  <span className="font-bold text-gray-900">{count}</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-l from-[#091526] to-[#1e40af] h-3 rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${(count / maxTypeCount) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            )) : (
+              <div className="text-center text-gray-400 py-8">لا توجد بيانات كافية للعرض</div>
+            )}
+          </div>
+        </div>
+
+        {/* Top Departments */}
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+             <h3 className="text-lg font-bold text-[#091526] flex items-center gap-2">
+               <Building size={20} className="text-[#eab308]" />
+               أكثر الإدارات طلباً
+             </h3>
+          </div>
+          <div className="space-y-4">
+             {sortedDepts.length > 0 ? sortedDepts.map(([dept, count], idx) => (
+               <div key={idx} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs">
+                      {idx + 1}
+                    </div>
+                    <span className="font-medium text-gray-700 text-sm">{dept}</span>
+                  </div>
+                  <span className="bg-[#091526] text-white text-xs px-2 py-1 rounded-md font-bold">{count}</span>
+               </div>
+             )) : (
+               <div className="text-center text-gray-400 py-8">لا توجد بيانات</div>
+             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity Table */}
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+         <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+             <h3 className="text-lg font-bold text-[#091526] flex items-center gap-2">
+               <Activity size={20} className="text-[#eab308]" />
+               أحدث السجلات المضافة (المستلمين)
+             </h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-right">
+              <thead className="bg-gray-50 text-gray-600 font-bold border-b border-gray-200">
+                <tr>
+                  <th className="py-3 px-4 text-right">الاسم</th>
+                  <th className="py-3 px-4 text-right">الإدارة</th>
+                  <th className="py-3 px-4 text-right">نوع البطاقة</th>
+                  <th className="py-3 px-4 text-right">التاريخ</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {recentRecipients.length > 0 ? recentRecipients.map(row => (
+                  <tr key={row.id} className="hover:bg-blue-50/50 transition-colors">
+                    <td className="py-3 px-4 font-medium text-gray-900">{row.recipientName}</td>
+                    <td className="py-3 px-4 text-gray-600">{row.department}</td>
+                    <td className="py-3 px-4">
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{row.cardType || 'عام'}</span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-500 font-mono text-xs">{row.receiptDate || '-'}</td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan={4} className="text-center py-6 text-gray-400">لا توجد سجلات حديثة</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  );
+};
+
+
+// 2. Active Cards Page Component
 interface ActiveCardsPageProps {
   rows: ActiveCardRow[];
   setRows: React.Dispatch<React.SetStateAction<ActiveCardRow[]>>;
@@ -176,7 +386,7 @@ const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShow
   );
 };
 
-// 2. Recipients Page Component
+// 3. Recipients Page Component
 interface RecipientsPageProps {
   rows: RecipientRow[];
   setRows: React.Dispatch<React.SetStateAction<RecipientRow[]>>;
@@ -260,7 +470,7 @@ const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowTo
     <div className="w-full max-w-[297mm] mx-auto bg-white shadow-lg min-h-[210mm] p-8 flex flex-col relative print:shadow-none print:p-0 landscape-mode">
       <div className="bg-[#091526] text-white border border-[#091526] border-b-4 border-b-[#eab308] p-6 text-center">
         <h1 className="text-xl font-bold mb-6">إدارة الخدمات العامة / قسم إدارة المرافق</h1>
-        <h2 className="text-xl font-bold">كشف المستلمين للبطاقات</h2>
+        <h2 className="text-xl font-bold">كشف بأسماء المستلمين للبطاقات</h2>
       </div>
 
       <div className="mb-4 mt-2 flex justify-start gap-2 no-print print:hidden">
@@ -444,6 +654,9 @@ const App: React.FC = () => {
     setDateStr(formatter.format(date));
   }, []);
 
+  const validRecipientsCount = recipientRows.filter(r => r.recipientName.trim() !== '').length;
+  const validActiveCardsCount = activeRows.filter(r => r.cardNumber.trim() !== '' || r.cardType.trim() !== '').length;
+
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ id: Date.now(), message, type });
     setTimeout(() => setToast(null), 3000);
@@ -495,7 +708,7 @@ const App: React.FC = () => {
 
         wscols = [ { wch: 5 }, { wch: 35 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 50 }];
 
-      } else {
+      } else if (currentTab === Tab.ACTIVE_CARDS) {
         fileName = 'Active_Cards.xlsx';
         const rowsToExport = activeRows.filter(row => row.cardType || row.cardNumber || row.cardCode || row.notes);
 
@@ -509,6 +722,15 @@ const App: React.FC = () => {
         }));
 
         wscols = [ { wch: 5 }, { wch: 30 }, { wch: 30 }, { wch: 25 }, { wch: 25 }, { wch: 60 }];
+      } else {
+        // Export Dashboard Data Summary
+        fileName = 'Dashboard_Summary.xlsx';
+        const validRecipients = recipientRows.filter(r => r.recipientName.trim() !== '');
+        const validActiveCards = activeRows.filter(r => r.cardNumber.trim() !== '' || r.cardType.trim() !== '');
+        dataToExport = [
+           { "الإحصائية": "إجمالي المستلمين", "القيمة": validRecipients.length },
+           { "الإحصائية": "البطاقات الفعالة", "القيمة": validActiveCards.length }
+        ];
       }
 
       const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -566,7 +788,7 @@ const App: React.FC = () => {
         for(let i = 0; i < rowsNeeded; i++) finalRows.push({ ...INITIAL_RECIPIENT_ROWS[0], id: timestamp + newRows.length + i });
         setRecipientRows(finalRows);
         showToast('تم استيراد البيانات بنجاح', 'success');
-      } else {
+      } else if (currentTab === Tab.ACTIVE_CARDS) {
         const newRows: ActiveCardRow[] = data.map((row: any, index: number) => ({
           id: timestamp + index,
           cardType: row["نوع البطاقة"] || '',
@@ -581,6 +803,8 @@ const App: React.FC = () => {
         for(let i = 0; i < rowsNeeded; i++) finalRows.push({ ...INITIAL_ACTIVE_ROWS[0], id: timestamp + newRows.length + i });
         setActiveRows(finalRows);
         showToast('تم استيراد البيانات بنجاح', 'success');
+      } else {
+        showToast('يرجى اختيار تبويب الجداول لاستيراد البيانات', 'error');
       }
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
@@ -613,6 +837,14 @@ const App: React.FC = () => {
         `}</style>
       )}
       {currentTab === Tab.ACTIVE_CARDS && (
+        <style>{`
+          @media print { 
+            @page { size: portrait; margin: 0; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          }
+        `}</style>
+      )}
+      {currentTab === Tab.DASHBOARD && (
         <style>{`
           @media print { 
             @page { size: portrait; margin: 0; }
@@ -654,17 +886,28 @@ const App: React.FC = () => {
       {/* Navigation Toolbar */}
       <nav className="w-full bg-white/80 backdrop-blur-md shadow-sm p-4 mb-8 no-print sticky top-0 z-50 border-b border-gray-200">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="relative grid grid-cols-2 bg-gray-200/80 p-1.5 rounded-xl border border-gray-300/50 shadow-inner w-full md:w-auto min-w-[320px]">
-            <div className="absolute top-1.5 bottom-1.5 rounded-lg bg-[#091526] shadow-[0_2px_15px_-3px_rgba(9,21,38,0.4)] border border-[#eab308]/30 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0" style={{ width: 'calc(50% - 6px)', right: currentTab === Tab.RECIPIENTS ? '6px' : 'calc(50%)' }}>
+          <div className="relative grid grid-cols-3 bg-gray-200/80 p-1.5 rounded-xl border border-gray-300/50 shadow-inner w-full md:w-auto min-w-[320px] md:min-w-[480px]">
+            <div 
+              className="absolute top-1.5 bottom-1.5 rounded-lg bg-[#091526] shadow-[0_2px_15px_-3px_rgba(9,21,38,0.4)] border border-[#eab308]/30 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0" 
+              style={{ 
+                width: 'calc(33.33% - 6px)', 
+                right: currentTab === Tab.RECIPIENTS ? '6px' : currentTab === Tab.ACTIVE_CARDS ? 'calc(33.33% + 2px)' : 'calc(66.66% - 2px)'
+              }}
+            >
                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg"></div>
             </div>
+            
             <button onClick={() => setCurrentTab(Tab.RECIPIENTS)} className={`relative z-10 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-300 font-bold text-sm md:text-base ${currentTab === Tab.RECIPIENTS ? 'text-white scale-105' : 'text-gray-600 hover:text-[#091526]'}`}>
               <ClipboardList size={20} className={`transition-colors duration-300 ${currentTab === Tab.RECIPIENTS ? "text-[#eab308]" : "text-gray-500"}`} />
-              <span>كشف المستلمين للبطاقات</span>
+              <span>سجل المستلمين ({validRecipientsCount})</span>
             </button>
             <button onClick={() => setCurrentTab(Tab.ACTIVE_CARDS)} className={`relative z-10 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-300 font-bold text-sm md:text-base ${currentTab === Tab.ACTIVE_CARDS ? 'text-white scale-105' : 'text-gray-600 hover:text-[#091526]'}`}>
               <IdCard size={20} className={`transition-colors duration-300 ${currentTab === Tab.ACTIVE_CARDS ? "text-[#eab308]" : "text-gray-500"}`} />
-              <span>بطاقات الزوار الفعالة</span>
+              <span>البطاقات الفعالة ({validActiveCardsCount})</span>
+            </button>
+            <button onClick={() => setCurrentTab(Tab.DASHBOARD)} className={`relative z-10 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-300 font-bold text-sm md:text-base ${currentTab === Tab.DASHBOARD ? 'text-white scale-105' : 'text-gray-600 hover:text-[#091526]'}`}>
+              <LayoutDashboard size={20} className={`transition-colors duration-300 ${currentTab === Tab.DASHBOARD ? "text-[#eab308]" : "text-gray-500"}`} />
+              <span>لوحة المعلومات</span>
             </button>
           </div>
 
@@ -686,7 +929,9 @@ const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="w-full flex justify-center px-4 flex-grow print:px-0 print:w-full">
-        {currentTab === Tab.ACTIVE_CARDS ? (
+        {currentTab === Tab.DASHBOARD ? (
+          <Dashboard activeRows={activeRows} recipientRows={recipientRows} />
+        ) : currentTab === Tab.ACTIVE_CARDS ? (
           <ActiveCardsPage rows={activeRows} setRows={setActiveRows} onShowToast={showToast} onSave={handleSave} />
         ) : (
           <div className="overflow-x-auto print:overflow-visible w-full flex justify-center">
