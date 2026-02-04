@@ -3,7 +3,7 @@ import {
   Printer, MapPin, Phone, Mail, ChevronLeft, CalendarDays, Download, Upload, 
   CheckCircle, AlertCircle, X, ClipboardList, IdCard, Plus, Trash2, Paperclip, 
   FileImage, FileText, FileSpreadsheet, File, FolderOpen, Save, LayoutDashboard,
-  Users, BarChart3, PieChart, TrendingUp, Activity, Building
+  Users, BarChart3, PieChart, TrendingUp, Activity, Building, Bell, Timer, Trophy
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { ActiveCardRow, RecipientRow } from './types';
@@ -657,6 +657,21 @@ const App: React.FC = () => {
   const validRecipientsCount = recipientRows.filter(r => r.recipientName.trim() !== '').length;
   const validActiveCardsCount = activeRows.filter(r => r.cardNumber.trim() !== '' || r.cardType.trim() !== '').length;
 
+  // --- Ticker Calculations ---
+  const validRecipients = recipientRows.filter(r => r.recipientName.trim() !== '');
+  const latestRecipient = validRecipients.length > 0 
+    ? [...validRecipients].sort((a, b) => b.id - a.id)[0] 
+    : null;
+
+  const deptCounts: Record<string, number> = {};
+  validRecipients.forEach(r => {
+    if(r.department && r.department.trim()) {
+       deptCounts[r.department] = (deptCounts[r.department] || 0) + 1;
+    }
+  });
+  const topDept = Object.entries(deptCounts).sort((a, b) => b[1] - a[1])[0];
+
+
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ id: Date.now(), message, type });
     setTimeout(() => setToast(null), 3000);
@@ -853,8 +868,22 @@ const App: React.FC = () => {
         `}</style>
       )}
 
+      {/* Animation Styles */}
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          animation: marquee 60s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
       {/* Main Page Header */}
-      <header className="w-full bg-[#091526] border-b-4 border-[#eab308] no-print relative">
+      <header className="w-full bg-[#091526] border-b-4 border-[#eab308] no-print relative shadow-md">
         <div className="max-w-[98%] mx-auto flex flex-col md:flex-row items-center justify-between p-4 md:p-6 gap-6 relative">
            <div className="flex flex-row items-center gap-5 md:gap-6 shrink-0 z-10">
               <div className="relative w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#2563eb] to-[#1e40af] rounded-[1.5rem] flex items-center justify-center shadow-2xl border-t border-white/20 shrink-0">
@@ -883,6 +912,43 @@ const App: React.FC = () => {
         </div>
       </header>
 
+      {/* Breaking News / Statistics Ticker Bar */}
+      <div className="w-full bg-[#1e293b] text-white border-y border-[#eab308]/50 shadow-lg overflow-hidden no-print mt-8 mb-2">
+          <div className="flex items-center h-12 w-full max-w-[98%] mx-auto">
+             {/* Ticker Label */}
+             <div className="bg-[#eab308] text-[#091526] h-full flex items-center px-6 font-black text-sm md:text-base shrink-0 z-20 shadow-lg relative clip-path-slant-r">
+               <Bell className="ml-2 animate-pulse" size={20} />
+               <span>آخر المستجدات</span>
+               {/* Decorative slanted edge effect using CSS clip-path or absolute div could be added here, sticking to simple background for now */}
+               <div className="absolute left-0 top-0 bottom-0 w-4 bg-[#eab308] skew-x-12 -ml-2 -z-10"></div>
+             </div>
+
+             {/* Marquee Content */}
+             <div className="flex-1 flex items-center overflow-hidden relative h-full bg-[#0f2038]">
+               <div className="whitespace-nowrap animate-marquee flex items-center gap-12 px-4 text-sm font-medium text-gray-200">
+                  <span className="flex items-center gap-2 text-white"><Users size={16} className="text-blue-400"/> إجمالي المستلمين: <span className="font-bold text-[#eab308] text-lg">{validRecipientsCount}</span></span>
+                  <span className="text-gray-600">|</span>
+                  <span className="flex items-center gap-2 text-white"><IdCard size={16} className="text-emerald-400"/> البطاقات الفعالة: <span className="font-bold text-[#eab308] text-lg">{validActiveCardsCount}</span></span>
+                  <span className="text-gray-600">|</span>
+                  <span className="flex items-center gap-2 text-white"><Timer size={16} className="text-orange-400"/> آخر مستلم: <span className="font-bold text-white">{latestRecipient ? `${latestRecipient.recipientName} (${latestRecipient.receiptDate || 'بدون تاريخ'})` : 'لا يوجد سجلات'}</span></span>
+                  <span className="text-gray-600">|</span>
+                  <span className="flex items-center gap-2 text-white"><Trophy size={16} className="text-purple-400"/> الإدارة الأكثر طلباً: <span className="font-bold text-white">{topDept ? `${topDept[0]} (${topDept[1]})` : '-'}</span></span>
+                  
+                  {/* Duplicate content for seamless loop */}
+                  <span className="text-gray-600 mx-8">***</span>
+                  
+                  <span className="flex items-center gap-2 text-white"><Users size={16} className="text-blue-400"/> إجمالي المستلمين: <span className="font-bold text-[#eab308] text-lg">{validRecipientsCount}</span></span>
+                  <span className="text-gray-600">|</span>
+                  <span className="flex items-center gap-2 text-white"><IdCard size={16} className="text-emerald-400"/> البطاقات الفعالة: <span className="font-bold text-[#eab308] text-lg">{validActiveCardsCount}</span></span>
+                  <span className="text-gray-600">|</span>
+                  <span className="flex items-center gap-2 text-white"><Timer size={16} className="text-orange-400"/> آخر مستلم: <span className="font-bold text-white">{latestRecipient ? `${latestRecipient.recipientName} (${latestRecipient.receiptDate || 'بدون تاريخ'})` : 'لا يوجد سجلات'}</span></span>
+                  <span className="text-gray-600">|</span>
+                  <span className="flex items-center gap-2 text-white"><Trophy size={16} className="text-purple-400"/> الإدارة الأكثر طلباً: <span className="font-bold text-white">{topDept ? `${topDept[0]} (${topDept[1]})` : '-'}</span></span>
+               </div>
+             </div>
+          </div>
+        </div>
+
       {/* Navigation Toolbar */}
       <nav className="w-full bg-white/80 backdrop-blur-md shadow-sm p-4 mb-8 no-print sticky top-0 z-50 border-b border-gray-200">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
@@ -907,7 +973,7 @@ const App: React.FC = () => {
             </button>
             <button onClick={() => setCurrentTab(Tab.DASHBOARD)} className={`relative z-10 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-300 font-bold text-sm md:text-base ${currentTab === Tab.DASHBOARD ? 'text-white scale-105' : 'text-gray-600 hover:text-[#091526]'}`}>
               <LayoutDashboard size={20} className={`transition-colors duration-300 ${currentTab === Tab.DASHBOARD ? "text-[#eab308]" : "text-gray-500"}`} />
-              <span>لوحة المعلومات</span>
+              <span>لوحة المعلومات ({validRecipientsCount})</span>
             </button>
           </div>
 
