@@ -312,7 +312,7 @@ const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShow
       <div className="relative bg-gradient-to-l from-[#0a274c] via-[#173f6e] to-[#2c5784] text-white rounded-t-xl min-h-[70px] px-6 py-2.5 flex items-center justify-between overflow-hidden border-b-2 border-[#091526]">
         {/* Decorative Left Badge & Gold Stripes Image */}
         <img
-          src="/assets/table-header-left.png"
+          src="./assets/table-header-left.png"
           alt=""
           aria-hidden="true"
           className="absolute left-0 top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
@@ -526,7 +526,7 @@ const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowTo
       <div className="relative bg-gradient-to-l from-[#0a274c] via-[#173f6e] to-[#2c5784] text-white rounded-t-xl min-h-[70px] px-6 py-2.5 flex items-center justify-between overflow-hidden border-b-2 border-[#091526]">
         {/* Decorative Left Badge & Gold Stripes Image */}
         <img
-          src="/assets/table-header-left.png"
+          src="./assets/table-header-left.png"
           alt=""
           aria-hidden="true"
           className="absolute left-0 top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
@@ -1120,13 +1120,13 @@ const App: React.FC = () => {
       <header className="w-full bg-gradient-to-b from-[#041328] via-[#092140] to-[#061830] border-b-2 border-[#eab308] no-print relative overflow-hidden shadow-md">
         {/* Decorative Diagonal Gold/Blue Ribbons */}
         <img
-          src="/assets/header-ribbon-left.png"
+          src="./assets/header-ribbon-left.png"
           alt=""
           aria-hidden="true"
           className="hidden lg:block absolute left-[17%] top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
         />
         <img
-          src="/assets/header-ribbon-right.png"
+          src="./assets/header-ribbon-right.png"
           alt=""
           aria-hidden="true"
           className="hidden lg:block absolute right-[20%] top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
@@ -1180,7 +1180,7 @@ const App: React.FC = () => {
       <section className="w-full bg-[#061830] border-b-2 border-[#eab308]/80 no-print overflow-hidden">
         <div className="max-w-[1448px] mx-auto w-full">
           <img
-            src="/assets/hero-reception.png"
+            src="./assets/hero-reception.png"
             alt="مكتب الاستقبال وإدارة الزوار - SAHER"
             className="w-full h-auto block object-cover select-none"
           />
@@ -1454,7 +1454,7 @@ const App: React.FC = () => {
               </div>
             </div>
             <img
-              src="/assets/footer-skyline.png"
+              src="./assets/footer-skyline.png"
               alt=""
               aria-hidden="true"
               className="hidden sm:block h-20 w-auto object-contain opacity-95 pointer-events-none select-none"

@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Cairo', sans-serif;
+  }
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.65;
+  cursor: pointer;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white;
+  }
+  /* Ensure inputs look like text when printed */
+  input, textarea {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    resize: none !important;
+    overflow: hidden !important;
+  }
+  /* Hide file inputs in print */
+  input[type="file"] {
+    display: none;
+  }
+}
