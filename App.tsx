@@ -3,7 +3,8 @@ import {
   Printer, MapPin, Phone, Mail, ChevronLeft, CalendarDays, Download, Upload, 
   CheckCircle, AlertCircle, X, ClipboardList, IdCard, Plus, Trash2, Paperclip, 
   FileImage, FileText, FileSpreadsheet, File, FolderOpen, Save, LayoutDashboard,
-  Users, BarChart3, PieChart, TrendingUp, Activity, Building, Bell, Timer, Trophy
+  Users, BarChart3, PieChart, TrendingUp, Activity, Building, Bell, Timer, Trophy,
+  User, Building2, CreditCard, Hash, MessageSquare, ChevronDown, Settings
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { ActiveCardRow, RecipientRow } from './types';
@@ -20,6 +21,19 @@ interface Toast {
   message: string;
   type: 'success' | 'error';
 }
+
+const DEPARTMENT_SUGGESTIONS = [
+  'إدارة الخدمات العامة',
+  'قسم إدارة المرافق',
+  'إدارة الموارد البشرية',
+  'إدارة تقنية المعلومات',
+  'الإدارة المالية',
+  'إدارة العمليات',
+  'إدارة العلاقات العامة',
+  'مكتب المدير العام',
+  'قسم المشتريات',
+  'أخرى'
+];
 
 // --- Helper Components ---
 
@@ -59,102 +73,101 @@ const Dashboard: React.FC<DashboardProps> = ({ activeRows, recipientRows }) => {
   const recentRecipients = [...validRecipients].sort((a, b) => b.id - a.id).slice(0, 5);
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-8 animate-fade-in">
+    <div className="w-full max-w-[1400px] mx-auto p-4 space-y-6">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        {/* Card 1: Recipients - Blue Theme */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-blue-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-cyan-500"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Card 1: Recipients */}
+        <div className="bg-white rounded-xl p-5 shadow-md border border-[#b8cce0] hover:shadow-lg transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#091526] to-[#1e40af]"></div>
           <div className="flex justify-between items-start">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-1">إجمالي المستلمين</p>
-              <h3 className="text-4xl font-black text-blue-800">{totalRecipients}</h3>
+              <h3 className="text-3xl font-black text-[#091526] tabular-nums">{totalRecipients}</h3>
             </div>
             <div className="p-3 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors shadow-sm">
-              <Users className="text-blue-600" size={24} />
+              <Users className="text-blue-700" size={24} />
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
-            <TrendingUp size={12} className="text-blue-500" />
+          <p className="text-xs text-gray-500 mt-3 flex items-center gap-1">
+            <TrendingUp size={12} className="text-blue-600" />
             <span>يتم تحديث البيانات تلقائياً</span>
           </p>
         </div>
 
-        {/* Card 2: Active Cards - Emerald Theme */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-emerald-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600 to-teal-500"></div>
+        {/* Card 2: Active Cards */}
+        <div className="bg-white rounded-xl p-5 shadow-md border border-[#b8cce0] hover:shadow-lg transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-700 to-teal-500"></div>
           <div className="flex justify-between items-start">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-1">البطاقات الفعالة</p>
-              <h3 className="text-4xl font-black text-emerald-800">{totalActiveCards}</h3>
+              <h3 className="text-3xl font-black text-emerald-800 tabular-nums">{totalActiveCards}</h3>
             </div>
             <div className="p-3 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors shadow-sm">
               <IdCard className="text-emerald-600" size={24} />
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
+          <p className="text-xs text-gray-500 mt-3 flex items-center gap-1">
             <Activity size={12} className="text-emerald-600" />
             <span>بطاقات قيد الاستخدام حالياً</span>
           </p>
         </div>
 
-        {/* Card 3: Attachments - Purple Theme */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-purple-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-fuchsia-500"></div>
+        {/* Card 3: Attachments */}
+        <div className="bg-white rounded-xl p-5 shadow-md border border-[#b8cce0] hover:shadow-lg transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#15365c] to-[#eab308]"></div>
           <div className="flex justify-between items-start">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-1">المرفقات المؤرشفة</p>
-              <h3 className="text-4xl font-black text-purple-800">{totalAttachments}</h3>
+              <h3 className="text-3xl font-black text-[#091526] tabular-nums">{totalAttachments}</h3>
             </div>
-            <div className="p-3 bg-purple-50 rounded-xl group-hover:bg-purple-100 transition-colors shadow-sm">
-              <Paperclip className="text-purple-600" size={24} />
+            <div className="p-3 bg-amber-50 rounded-xl group-hover:bg-amber-100 transition-colors shadow-sm">
+              <Paperclip className="text-amber-600" size={24} />
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
-            <FileText size={12} className="text-purple-500" />
+          <p className="text-xs text-gray-500 mt-3 flex items-center gap-1">
+            <FileText size={12} className="text-amber-600" />
             <span>ملفات وصور محفوظة</span>
           </p>
         </div>
 
-        {/* Card 4: Departments - Orange Theme */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border-r-4 border-orange-500 hover:shadow-xl transition-shadow relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-amber-400"></div>
+        {/* Card 4: Departments */}
+        <div className="bg-white rounded-xl p-5 shadow-md border border-[#b8cce0] hover:shadow-lg transition-shadow relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-yellow-400"></div>
           <div className="flex justify-between items-start">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-1">الإدارات المسجلة</p>
-              <h3 className="text-4xl font-black text-orange-800">{Object.keys(deptCounts).length}</h3>
+              <h3 className="text-3xl font-black text-[#091526] tabular-nums">{Object.keys(deptCounts).length}</h3>
             </div>
             <div className="p-3 bg-orange-50 rounded-xl group-hover:bg-orange-100 transition-colors shadow-sm">
               <Building className="text-orange-600" size={24} />
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-4 flex items-center gap-1">
+          <p className="text-xs text-gray-500 mt-3 flex items-center gap-1">
             <BarChart3 size={12} className="text-orange-500" />
             <span>تنوع في الجهات المستفيدة</span>
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Charts Section - Types */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-          <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
-             <h3 className="text-lg font-bold text-[#091526] flex items-center gap-2">
-               <PieChart size={20} className="text-[#eab308]" />
-               توزيع أنواع البطاقات
-             </h3>
+        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-[#b8cce0]">
+          <div className="flex items-center justify-between mb-5 border-b border-gray-100 pb-3">
+            <h3 className="text-base font-bold text-[#091526] flex items-center gap-2">
+              <PieChart size={20} className="text-[#eab308]" />
+              توزيع أنواع البطاقات
+            </h3>
           </div>
           <div className="space-y-4">
             {sortedTypes.length > 0 ? sortedTypes.map(([type, count], idx) => (
               <div key={idx} className="relative">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="font-semibold text-gray-700">{type}</span>
-                  <span className="font-bold text-gray-900">{count}</span>
+                  <span className="font-bold text-gray-900 tabular-nums">{count}</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                   <div 
-                    className="bg-gradient-to-l from-[#091526] to-[#1e40af] h-3 rounded-full transition-all duration-1000 ease-out"
+                    className="bg-gradient-to-l from-[#091526] to-[#1e40af] h-3 rounded-full transition-all duration-700 ease-out"
                     style={{ width: `${(count / maxTypeCount) * 100}%` }}
                   ></div>
                 </div>
@@ -166,65 +179,65 @@ const Dashboard: React.FC<DashboardProps> = ({ activeRows, recipientRows }) => {
         </div>
 
         {/* Top Departments */}
-        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-          <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
-             <h3 className="text-lg font-bold text-[#091526] flex items-center gap-2">
-               <Building size={20} className="text-[#eab308]" />
-               أكثر الإدارات طلباً
-             </h3>
+        <div className="bg-white p-6 rounded-xl shadow-md border border-[#b8cce0]">
+          <div className="flex items-center justify-between mb-5 border-b border-gray-100 pb-3">
+            <h3 className="text-base font-bold text-[#091526] flex items-center gap-2">
+              <Building size={20} className="text-[#eab308]" />
+              أكثر الإدارات طلباً
+            </h3>
           </div>
-          <div className="space-y-4">
-             {sortedDepts.length > 0 ? sortedDepts.map(([dept, count], idx) => (
-               <div key={idx} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs">
-                      {idx + 1}
-                    </div>
-                    <span className="font-medium text-gray-700 text-sm">{dept}</span>
+          <div className="space-y-3">
+            {sortedDepts.length > 0 ? sortedDepts.map(([dept, count], idx) => (
+              <div key={idx} className="flex items-center justify-between bg-[#f4f8fc] p-3 rounded-lg border border-[#d0e0f0]">
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-full bg-[#091526] text-[#eab308] flex items-center justify-center font-bold text-xs tabular-nums">
+                    {idx + 1}
                   </div>
-                  <span className="bg-[#091526] text-white text-xs px-2 py-1 rounded-md font-bold">{count}</span>
-               </div>
-             )) : (
-               <div className="text-center text-gray-400 py-8">لا توجد بيانات</div>
-             )}
+                  <span className="font-medium text-gray-800 text-sm">{dept}</span>
+                </div>
+                <span className="bg-[#091526] text-white text-xs px-2.5 py-1 rounded-md font-bold tabular-nums">{count}</span>
+              </div>
+            )) : (
+              <div className="text-center text-gray-400 py-8">لا توجد بيانات</div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Recent Activity Table */}
-      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-         <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
-             <h3 className="text-lg font-bold text-[#091526] flex items-center gap-2">
-               <Activity size={20} className="text-[#eab308]" />
-               أحدث السجلات المضافة (المستلمين)
-             </h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-right">
-              <thead className="bg-gray-50 text-gray-600 font-bold border-b border-gray-200">
-                <tr>
-                  <th className="py-3 px-4 text-right">الاسم</th>
-                  <th className="py-3 px-4 text-right">الإدارة</th>
-                  <th className="py-3 px-4 text-right">نوع البطاقة</th>
-                  <th className="py-3 px-4 text-right">التاريخ</th>
+      <div className="bg-white p-6 rounded-xl shadow-md border border-[#b8cce0] overflow-hidden">
+        <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+          <h3 className="text-base font-bold text-[#091526] flex items-center gap-2">
+            <Activity size={20} className="text-[#eab308]" />
+            أحدث السجلات المضافة (المستلمين)
+          </h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-right border-collapse">
+            <thead className="bg-[#0f294a] text-white font-bold">
+              <tr>
+                <th className="py-2.5 px-4 text-right border border-[#8fabc7]">الاسم</th>
+                <th className="py-2.5 px-4 text-right border border-[#8fabc7]">الإدارة</th>
+                <th className="py-2.5 px-4 text-right border border-[#8fabc7]">نوع البطاقة</th>
+                <th className="py-2.5 px-4 text-right border border-[#8fabc7]">التاريخ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentRecipients.length > 0 ? recentRecipients.map((row, idx) => (
+                <tr key={row.id} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-[#dce8f5]'} hover:bg-blue-100/60 transition-colors`}>
+                  <td className="py-2.5 px-4 font-medium text-gray-900 border border-[#8fabc7]">{row.recipientName}</td>
+                  <td className="py-2.5 px-4 text-gray-700 border border-[#8fabc7]">{row.department}</td>
+                  <td className="py-2.5 px-4 border border-[#8fabc7]">
+                    <span className="font-semibold text-[#091526] text-xs">{row.cardType || 'عام'}</span>
+                  </td>
+                  <td className="py-2.5 px-4 text-gray-600 font-mono text-xs tabular-nums border border-[#8fabc7]">{row.receiptDate || '-'}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {recentRecipients.length > 0 ? recentRecipients.map(row => (
-                  <tr key={row.id} className="hover:bg-blue-50/50 transition-colors">
-                    <td className="py-3 px-4 font-medium text-gray-900">{row.recipientName}</td>
-                    <td className="py-3 px-4 text-gray-600">{row.department}</td>
-                    <td className="py-3 px-4">
-                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{row.cardType || 'عام'}</span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-500 font-mono text-xs">{row.receiptDate || '-'}</td>
-                  </tr>
-                )) : (
-                  <tr><td colSpan={4} className="text-center py-6 text-gray-400">لا توجد سجلات حديثة</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              )) : (
+                <tr><td colSpan={4} className="text-center py-6 text-gray-400 border border-[#8fabc7]">لا توجد سجلات حديثة</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -239,7 +252,7 @@ interface ActiveCardsPageProps {
   onSave: () => void;
 }
 
-const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShowToast, onSave }) => {
+const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShowToast }) => {
   const tableRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
@@ -258,21 +271,9 @@ const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShow
 
   const handleFileChange = (id: number, file: File | null) => {
     setRows(prev => prev.map(row => row.id === id ? { ...row, attachment: file } : row));
-  };
-
-  const handleAddRow = () => {
-    setRows(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        cardType: '',
-        cardNumber: '',
-        cardCode: '',
-        attachment: null,
-        notes: ''
-      }
-    ]);
-    onShowToast('تم إضافة صف جديد بنجاح', 'success');
+    if (file) {
+      onShowToast(`تم إرفاق الملف: ${file.name}`, 'success');
+    }
   };
 
   const handleDeleteRow = (id: number) => {
@@ -285,18 +286,18 @@ const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShow
     const name = file.name.toLowerCase();
 
     if (type.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/.test(name)) {
-      return <FileImage size={18} className="text-purple-600" />;
+      return <FileImage size={15} className="text-purple-600" />;
     }
     if (type === 'application/pdf' || /\.pdf$/.test(name)) {
-      return <FileText size={18} className="text-red-500" />;
+      return <FileText size={15} className="text-red-500" />;
     }
     if (/\.(doc|docx)$/.test(name) || type.includes('word')) {
-      return <FileText size={18} className="text-blue-600" />;
+      return <FileText size={15} className="text-blue-600" />;
     }
     if (/\.(xls|xlsx|csv)$/.test(name) || type.includes('spreadsheet') || type.includes('excel')) {
-      return <FileSpreadsheet size={18} className="text-green-600" />;
+      return <FileSpreadsheet size={15} className="text-green-600" />;
     }
-    return <File size={18} className="text-gray-600" />;
+    return <File size={15} className="text-gray-600" />;
   };
 
   const adjustTextareaHeight = (e: React.FormEvent<HTMLTextAreaElement>) => {
@@ -306,79 +307,152 @@ const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShow
   };
 
   return (
-    <div className="w-full max-w-[210mm] mx-auto bg-white shadow-lg min-h-[297mm] p-8 flex flex-col relative print:shadow-none print:p-0">
-      <div className="bg-[#091526] text-white border border-[#091526] border-b-4 border-b-[#eab308] p-6 text-center mb-1">
-        <h1 className="text-xl font-bold mb-6">إدارة الخدمات العامة / قسم إدارة المرافق</h1>
-        <h2 className="text-2xl font-bold">بطاقات الزوار الفعالة</h2>
+    <div className="w-full max-w-[1400px] mx-auto bg-white rounded-2xl shadow-md border border-[#b8cce0] p-2.5 flex flex-col relative print:shadow-none print:p-0 print:border-none">
+      {/* Section Header Banner matching Reference Image */}
+      <div className="relative bg-gradient-to-l from-[#0a274c] via-[#173f6e] to-[#2c5784] text-white rounded-t-xl min-h-[70px] px-6 py-2.5 flex items-center justify-between overflow-hidden border-b-2 border-[#091526]">
+        {/* Decorative Left Badge & Gold Stripes Image */}
+        <img
+          src="/assets/table-header-left.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute left-0 top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
+        />
+
+        {/* Right Side Title & Gold Icon Box */}
+        <div className="relative z-10 flex items-center gap-4 mr-auto sm:mr-0">
+          <div className="w-12 h-11 rounded-xl border-2 border-[#eab308] bg-[#071a33]/80 flex items-center justify-center shadow-md shrink-0">
+            <IdCard size={26} className="text-[#eab308]" />
+          </div>
+          <div className="flex flex-col text-right">
+            <h1 className="text-sm md:text-base font-bold text-gray-100 leading-snug">
+              إدارة الخدمات العامة / قسم إدارة المرافق
+            </h1>
+            <h2 className="text-lg md:text-xl font-extrabold text-white leading-tight">
+              بطاقات الزوار الفعالة
+            </h2>
+          </div>
+        </div>
       </div>
 
-      <div className="mb-4 mt-2 flex justify-start gap-2 no-print print:hidden">
-        <button onClick={handleAddRow} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
-          <Plus size={18} />
-          <span>إضافة صف جديد</span>
-        </button>
-        <button onClick={onSave} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
-          <Save size={18} />
-          <span>حفظ التغييرات</span>
-        </button>
-      </div>
-
-      <div className="flex-grow">
-        <table ref={tableRef} className="w-full border-collapse border border-[#091526] table-fixed">
+      {/* Table Container */}
+      <div className="flex-grow overflow-x-auto mt-1">
+        <table ref={tableRef} className="w-full border-collapse border border-[#7c9ab8] table-fixed text-xs">
           <thead>
-            <tr className="bg-[#334155] text-white h-12 text-center align-middle">
-              <th className="border border-[#091526] w-12 font-bold align-middle text-center">م</th>
-              <th className="border border-[#091526] w-1/5 font-bold align-middle text-center">نوع البطاقة</th>
-              <th className="border border-[#091526] w-1/5 font-bold align-middle text-center">رقم البطاقة</th>
-              <th className="border border-[#091526] w-1/5 font-bold align-middle text-center">كود البطاقة</th>
-              <th className="border border-[#091526] w-12 font-bold bg-[#283547] align-middle text-center">
-                <div className="flex justify-center items-center h-full w-full">
-                  <FolderOpen size={18} className="text-white" />
+            <tr className="bg-gradient-to-b from-[#173a63] to-[#0c2340] text-white h-9 text-center align-middle">
+              <th className="border border-[#7c9ab8] w-11 font-bold align-middle text-center">م</th>
+              <th className="border border-[#7c9ab8] w-1/4 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <IdCard size={14} className="text-blue-200 shrink-0" />
+                  <span>نوع البطاقة</span>
                 </div>
               </th>
-              <th className="border border-[#091526] w-1/5 font-bold align-middle text-center">الملاحظات</th>
-              <th className="border border-[#091526] w-10 font-bold bg-[#334155] text-white align-middle print:hidden text-center">حذف</th>
+              <th className="border border-[#7c9ab8] w-1/4 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <CreditCard size={14} className="text-blue-200 shrink-0" />
+                  <span>رقم البطاقة</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-1/5 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <Hash size={14} className="text-blue-200 shrink-0" />
+                  <span>كود البطاقة</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-24 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <Paperclip size={14} className="text-blue-200 shrink-0" />
+                  <span>المرفقات</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <MessageSquare size={14} className="text-blue-200 shrink-0" />
+                  <span>الملاحظات</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-12 font-bold align-middle print:hidden text-center">حذف</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={row.id} className={`min-h-[48px] ${index % 2 === 0 ? 'bg-white' : 'bg-[#ebf4fa]'} text-center align-middle group`}>
-                <td className="border border-[#091526] font-bold text-sm bg-[#334155] text-white align-middle text-center h-full">
-                  <div className="flex items-center justify-center h-full min-h-[48px]">{index + 1}</div>
+              <tr key={row.id} className={`h-7 ${index % 2 === 0 ? 'bg-white' : 'bg-[#dce8f5]'} hover:bg-blue-100/50 text-center align-middle transition-colors group`}>
+                <td className="border border-[#8fabc7] font-bold text-xs bg-[#0d233d] text-white align-middle text-center tabular-nums">
+                  <div className="flex items-center justify-center h-full min-h-[26px]">{index + 1}</div>
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50 text-black placeholder-gray-400 resize-none overflow-hidden block" value={row.cardType} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'cardType', e.target.value)} />
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold placeholder-gray-400 resize-none overflow-hidden block leading-5"
+                    value={row.cardType}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'cardType', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50 text-black placeholder-gray-400 resize-none overflow-hidden block" value={row.cardNumber} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'cardNumber', e.target.value)} />
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold placeholder-gray-400 resize-none overflow-hidden block leading-5 tabular-nums"
+                    value={row.cardNumber}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'cardNumber', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50 text-black placeholder-gray-400 resize-none overflow-hidden block" value={row.cardCode} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'cardCode', e.target.value)} />
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold placeholder-gray-400 resize-none overflow-hidden block leading-5 tabular-nums"
+                    value={row.cardCode}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'cardCode', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-0 text-center relative group align-middle h-full">
-                  <div className="flex items-center justify-center h-full min-h-[48px] w-full">
-                    <input type="file" id={`file-${row.id}`} className="hidden" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" onClick={(e) => (e.currentTarget.value = '')} onChange={(e) => handleFileChange(row.id, e.target.files?.[0] || null)} />
-                    <label htmlFor={`file-${row.id}`} className={`flex items-center justify-center w-full h-full cursor-pointer hover:bg-blue-50 transition-colors py-2 ${!row.attachment ? 'text-gray-400 hover:text-blue-600' : ''}`} title={row.attachment ? row.attachment.name : "إرفاق ملف"}>
-                      {row.attachment ? getFileIcon(row.attachment) : <Paperclip size={16} />}
+                <td className="border border-[#8fabc7] p-0 text-center relative align-middle h-full">
+                  <div className="flex items-center justify-center h-full min-h-[26px] w-full">
+                    <input
+                      type="file"
+                      id={`active-file-${row.id}`}
+                      className="hidden"
+                      accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                      onClick={(e) => (e.currentTarget.value = '')}
+                      onChange={(e) => handleFileChange(row.id, e.target.files?.[0] || null)}
+                    />
+                    <label
+                      htmlFor={`active-file-${row.id}`}
+                      className={`flex items-center justify-center w-full h-full cursor-pointer hover:bg-blue-100/60 transition-colors py-1 ${!row.attachment ? 'text-[#476788] hover:text-[#091526]' : ''}`}
+                      title={row.attachment ? row.attachment.name : "إرفاق ملف"}
+                    >
+                      {row.attachment ? getFileIcon(row.attachment) : <Paperclip size={14} />}
                     </label>
                   </div>
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50 text-black placeholder-gray-400 resize-none overflow-hidden block" value={row.notes} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'notes', e.target.value)} />
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-medium placeholder-gray-400 resize-none overflow-hidden block leading-5"
+                    value={row.notes}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'notes', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-0 align-middle print:hidden bg-white">
-                   <div className="flex items-center justify-center h-full w-full min-h-[48px]">
-                     <button onClick={() => handleDeleteRow(row.id)} className="w-full h-full flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors py-3"><Trash2 size={16} /></button>
-                   </div>
+                <td className="border border-[#8fabc7] p-0 align-middle print:hidden">
+                  <div className="flex items-center justify-center h-full w-full min-h-[26px]">
+                    <button
+                      onClick={() => handleDeleteRow(row.id)}
+                      className="w-full h-full flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors py-1"
+                      title="حذف الصف"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="bg-[#091526] text-white border border-[#091526] p-4 flex justify-between items-center mt-auto px-12 print:mt-auto">
-        <p className="font-bold text-sm">ساهر للخدمات الذكية</p>
-        <p className="font-bold text-sm font-sans tracking-wide">SAHER FOR SMART SERVICE</p>
       </div>
     </div>
   );
@@ -392,7 +466,7 @@ interface RecipientsPageProps {
   onSave: () => void;
 }
 
-const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowToast, onSave }) => {
+const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowToast }) => {
   const tableRef = useRef<HTMLTableElement>(null);
 
   useEffect(() => {
@@ -411,25 +485,9 @@ const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowTo
 
   const handleFileChange = (id: number, file: File | null) => {
     setRows(prev => prev.map(row => row.id === id ? { ...row, attachment: file } : row));
-  };
-
-  const handleAddRow = () => {
-    setRows(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        recipientName: '',
-        department: '',
-        receiptDate: '',
-        cardType: '',
-        cardNumber: '',
-        cardCode: '',
-        duration: '',
-        attachment: null,
-        notes: ''
-      }
-    ]);
-    onShowToast('تم إضافة صف جديد بنجاح', 'success');
+    if (file) {
+      onShowToast(`تم إرفاق الملف: ${file.name}`, 'success');
+    }
   };
 
   const handleDeleteRow = (id: number) => {
@@ -442,18 +500,18 @@ const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowTo
     const name = file.name.toLowerCase();
 
     if (type.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/.test(name)) {
-      return <FileImage size={18} className="text-purple-600" />;
+      return <FileImage size={15} className="text-purple-600" />;
     }
     if (type === 'application/pdf' || /\.pdf$/.test(name)) {
-      return <FileText size={18} className="text-red-500" />;
+      return <FileText size={15} className="text-red-500" />;
     }
     if (/\.(doc|docx)$/.test(name) || type.includes('word')) {
-      return <FileText size={18} className="text-blue-600" />;
+      return <FileText size={15} className="text-blue-600" />;
     }
     if (/\.(xls|xlsx|csv)$/.test(name) || type.includes('spreadsheet') || type.includes('excel')) {
-      return <FileSpreadsheet size={18} className="text-green-600" />;
+      return <FileSpreadsheet size={15} className="text-green-600" />;
     }
-    return <File size={18} className="text-gray-600" />;
+    return <File size={15} className="text-gray-600" />;
   };
 
   const adjustTextareaHeight = (e: React.FormEvent<HTMLTextAreaElement>) => {
@@ -463,97 +521,252 @@ const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowTo
   };
 
   return (
-    <div className="w-full max-w-[297mm] mx-auto bg-white shadow-lg min-h-[210mm] p-8 flex flex-col relative print:shadow-none print:p-0 landscape-mode">
-      <div className="bg-[#091526] text-white border border-[#091526] border-b-4 border-b-[#eab308] p-6 text-center">
-        <h1 className="text-xl font-bold mb-6">إدارة الخدمات العامة / قسم إدارة المرافق</h1>
-        <h2 className="text-xl font-bold">كشف بأسماء المستلمين للبطاقات</h2>
+    <div className="w-full max-w-[1400px] mx-auto bg-white rounded-2xl shadow-md border border-[#b8cce0] p-2.5 flex flex-col relative print:shadow-none print:p-0 print:border-none landscape-mode">
+      {/* Section Header Banner matching Reference Image */}
+      <div className="relative bg-gradient-to-l from-[#0a274c] via-[#173f6e] to-[#2c5784] text-white rounded-t-xl min-h-[70px] px-6 py-2.5 flex items-center justify-between overflow-hidden border-b-2 border-[#091526]">
+        {/* Decorative Left Badge & Gold Stripes Image */}
+        <img
+          src="/assets/table-header-left.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute left-0 top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
+        />
+
+        {/* Right Side Title & Gold Icon Box */}
+        <div className="relative z-10 flex items-center gap-4 mr-auto sm:mr-0">
+          <div className="w-12 h-11 rounded-xl border-2 border-[#eab308] bg-[#071a33]/80 flex items-center justify-center shadow-md shrink-0">
+            <IdCard size={26} className="text-[#eab308]" />
+          </div>
+          <div className="flex flex-col text-right">
+            <h1 className="text-sm md:text-base font-bold text-gray-100 leading-snug">
+              إدارة الخدمات العامة / قسم إدارة المرافق
+            </h1>
+            <h2 className="text-lg md:text-xl font-extrabold text-white leading-tight">
+              كشف بأسماء المستلمين للبطاقات
+            </h2>
+          </div>
+        </div>
       </div>
 
-      <div className="mb-4 mt-2 flex justify-start gap-2 no-print print:hidden">
-        <button onClick={handleAddRow} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
-          <Plus size={18} />
-          <span>إضافة صف جديد</span>
-        </button>
-        <button onClick={onSave} className="flex items-center gap-2 bg-[#334155] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm text-sm font-bold">
-          <Save size={18} />
-          <span>حفظ التغييرات</span>
-        </button>
-      </div>
+      {/* Datalist for Department Field */}
+      <datalist id="saher-departments-list">
+        {DEPARTMENT_SUGGESTIONS.map((dept) => (
+          <option key={dept} value={dept} />
+        ))}
+      </datalist>
 
-      <div className="flex-grow">
-        <table ref={tableRef} className="w-full border-collapse border border-[#091526] table-fixed text-xs">
+      {/* Table Container */}
+      <div className="flex-grow overflow-x-auto mt-1">
+        <table ref={tableRef} className="w-full border-collapse border border-[#7c9ab8] table-fixed text-xs">
           <thead>
-            <tr className="bg-[#334155] text-white h-12 text-center align-middle">
-              <th className="border border-[#091526] w-8 font-bold align-middle text-center">م</th>
-              <th className="border border-[#091526] w-32 font-bold align-middle text-center">اسم المستلم</th>
-              <th className="border border-[#091526] w-24 font-bold align-middle text-center">الادارة</th>
-              <th className="border border-[#091526] w-28 font-bold align-middle text-center">تاريخ الاستلام</th>
-              <th className="border border-[#091526] w-24 font-bold align-middle text-center">نوع البطاقة</th>
-              <th className="border border-[#091526] w-24 font-bold align-middle text-center">رقم البطاقة</th>
-              <th className="border border-[#091526] w-24 font-bold align-middle text-center">كود البطاقة</th>
-              <th className="border border-[#091526] w-20 font-bold align-middle text-center">مدة البطاقة</th>
-              <th className="border border-[#091526] w-12 font-bold bg-[#283547] align-middle text-center">
-                <div className="flex justify-center items-center h-full w-full">
-                  <FolderOpen size={18} className="text-white" />
+            <tr className="bg-gradient-to-b from-[#173a63] to-[#0c2340] text-white h-9 text-center align-middle">
+              <th className="border border-[#7c9ab8] w-11 font-bold align-middle text-center">م</th>
+              <th className="border border-[#7c9ab8] w-44 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <User size={14} className="text-blue-200 shrink-0" />
+                  <span>اسم المستلم</span>
                 </div>
               </th>
-              <th className="border border-[#091526] w-28 font-bold align-middle text-center">الملاحظات</th>
-              <th className="border border-[#091526] w-8 font-bold bg-[#334155] text-white align-middle print:hidden text-center">حذف</th>
+              <th className="border border-[#7c9ab8] w-36 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <Building2 size={14} className="text-blue-200 shrink-0" />
+                  <span>الإدارة</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-28 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <CalendarDays size={14} className="text-blue-200 shrink-0" />
+                  <span>تاريخ الاستلام</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-24 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <IdCard size={14} className="text-blue-200 shrink-0" />
+                  <span>نوع البطاقة</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-24 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <CreditCard size={14} className="text-blue-200 shrink-0" />
+                  <span>رقم البطاقة</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-24 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <Hash size={14} className="text-blue-200 shrink-0" />
+                  <span>كود البطاقة</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-24 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <CalendarDays size={14} className="text-blue-200 shrink-0" />
+                  <span>مدة البطاقة</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-20 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Paperclip size={13} className="text-blue-200 shrink-0" />
+                  <span>المرفقات</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-28 font-bold align-middle text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <MessageSquare size={13} className="text-blue-200 shrink-0" />
+                  <span>الملاحظات</span>
+                </div>
+              </th>
+              <th className="border border-[#7c9ab8] w-11 font-bold align-middle print:hidden text-center">حذف</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={row.id} className={`min-h-[40px] ${index % 2 === 0 ? 'bg-white' : 'bg-[#ebf4fa]'} text-center align-middle group`}>
-                <td className="border border-[#091526] font-bold bg-[#334155] text-white align-middle text-center h-full">
-                  <div className="flex items-center justify-center h-full min-h-[40px]">{index + 1}</div>
+              <tr key={row.id} className={`h-7 ${index % 2 === 0 ? 'bg-white' : 'bg-[#dce8f5]'} hover:bg-blue-100/50 text-center align-middle transition-colors group`}>
+                {/* 1. Row Index */}
+                <td className="border border-[#8fabc7] font-bold text-xs bg-[#0d233d] text-white align-middle text-center tabular-nums">
+                  <div className="flex items-center justify-center h-full min-h-[25px]">{index + 1}</div>
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none text-black resize-none overflow-hidden block" value={row.recipientName} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'recipientName', e.target.value)} />
+
+                {/* 2. Recipient Name */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold resize-none overflow-hidden block leading-5"
+                    value={row.recipientName}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'recipientName', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none text-black resize-none overflow-hidden block" value={row.department} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'department', e.target.value)} />
-                </td>
-                <td className="border border-[#091526] p-1 align-middle h-full">
-                  <div className="flex items-center justify-center h-full w-full min-h-[40px]">
-                     <input type="date" lang="en" className="w-full h-full bg-transparent text-center focus:outline-none text-black font-inherit cursor-pointer uppercase text-xs sm:text-sm" style={{ fontFamily: 'inherit' }} value={row.receiptDate} onChange={(e) => handleInputChange(row.id, 'receiptDate', e.target.value)} />
+
+                {/* 3. Department (with Reference Placeholder & Chevron) */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle relative">
+                  <div className="flex items-center justify-between w-full h-full">
+                    <input
+                      type="text"
+                      list="saher-departments-list"
+                      placeholder="قسم / إدارة / أخرى"
+                      className="w-full bg-transparent text-center focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold placeholder-[#1e3a5f]/80 text-[11px] leading-5 pr-1 pl-4"
+                      value={row.department}
+                      onChange={(e) => handleInputChange(row.id, 'department', e.target.value)}
+                    />
+                    <ChevronDown size={13} className="text-[#3b5978] absolute left-1.5 pointer-events-none print:hidden" />
                   </div>
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none text-black resize-none overflow-hidden block" value={row.cardType} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'cardType', e.target.value)} />
+
+                {/* 4. Receipt Date (with Calendar Icon matching Reference) */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle h-full relative">
+                  <div className="flex items-center justify-between h-full w-full min-h-[25px] relative">
+                    <input
+                      type="date"
+                      lang="en"
+                      className={`w-full h-full bg-transparent text-center focus:outline-none font-inherit cursor-pointer uppercase text-[11px] tabular-nums ${row.receiptDate ? 'text-[#091526] font-semibold' : 'text-transparent focus:text-[#091526]'}`}
+                      style={{ fontFamily: 'inherit' }}
+                      value={row.receiptDate}
+                      onChange={(e) => handleInputChange(row.id, 'receiptDate', e.target.value)}
+                    />
+                    {!row.receiptDate && (
+                      <CalendarDays size={13} className="text-[#476788] absolute left-2 pointer-events-none print:hidden" />
+                    )}
+                  </div>
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none text-black resize-none overflow-hidden block" value={row.cardNumber} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'cardNumber', e.target.value)} />
+
+                {/* 5. Card Type */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold resize-none overflow-hidden block leading-5"
+                    value={row.cardType}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'cardType', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none text-black resize-none overflow-hidden block" value={row.cardCode} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'cardCode', e.target.value)} />
+
+                {/* 6. Card Number */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold resize-none overflow-hidden block leading-5 tabular-nums"
+                    value={row.cardNumber}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'cardNumber', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none text-black resize-none overflow-hidden block" value={row.duration} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'duration', e.target.value)} />
+
+                {/* 7. Card Code */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold resize-none overflow-hidden block leading-5 tabular-nums"
+                    value={row.cardCode}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'cardCode', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-0 text-center relative group align-middle h-full">
-                  <div className="flex items-center justify-center h-full min-h-[40px] w-full">
-                    <input type="file" id={`file-${row.id}`} className="hidden" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx" onClick={(e) => (e.currentTarget.value = '')} onChange={(e) => handleFileChange(row.id, e.target.files?.[0] || null)} />
-                    <label htmlFor={`file-${row.id}`} className={`flex items-center justify-center w-full h-full cursor-pointer hover:bg-blue-50 transition-colors py-2 ${!row.attachment ? 'text-gray-400 hover:text-blue-600' : ''}`} title={row.attachment ? row.attachment.name : "إرفاق ملف"}>
-                      {row.attachment ? getFileIcon(row.attachment) : <Paperclip size={16} />}
+
+                {/* 8. Duration */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-semibold resize-none overflow-hidden block leading-5"
+                    value={row.duration}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'duration', e.target.value)}
+                  />
+                </td>
+
+                {/* 9. Attachments */}
+                <td className="border border-[#8fabc7] p-0 text-center relative align-middle h-full">
+                  <div className="flex items-center justify-center h-full min-h-[25px] w-full">
+                    <input
+                      type="file"
+                      id={`file-${row.id}`}
+                      className="hidden"
+                      accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
+                      onClick={(e) => (e.currentTarget.value = '')}
+                      onChange={(e) => handleFileChange(row.id, e.target.files?.[0] || null)}
+                    />
+                    <label
+                      htmlFor={`file-${row.id}`}
+                      className={`flex items-center justify-center w-full h-full cursor-pointer hover:bg-blue-100/60 transition-colors py-1 ${!row.attachment ? 'text-[#476788] hover:text-[#091526]' : ''}`}
+                      title={row.attachment ? row.attachment.name : "إرفاق ملف"}
+                    >
+                      {row.attachment ? getFileIcon(row.attachment) : <Paperclip size={14} />}
                     </label>
                   </div>
                 </td>
-                <td className="border border-[#091526] p-1 align-middle">
-                  <textarea className="w-full bg-transparent text-center align-middle focus:outline-none text-black resize-none overflow-hidden block" value={row.notes} rows={1} onInput={adjustTextareaHeight} onFocus={adjustTextareaHeight} onChange={(e) => handleInputChange(row.id, 'notes', e.target.value)} />
+
+                {/* 10. Notes */}
+                <td className="border border-[#8fabc7] px-1.5 py-0.5 align-middle">
+                  <textarea
+                    className="w-full bg-transparent text-center align-middle focus:outline-none focus:bg-blue-50/70 text-[#091526] font-medium resize-none overflow-hidden block leading-5"
+                    value={row.notes}
+                    rows={1}
+                    onInput={adjustTextareaHeight}
+                    onFocus={adjustTextareaHeight}
+                    onChange={(e) => handleInputChange(row.id, 'notes', e.target.value)}
+                  />
                 </td>
-                <td className="border border-[#091526] p-0 align-middle print:hidden bg-white">
-                   <div className="flex items-center justify-center h-full w-full min-h-[40px]">
-                     <button onClick={() => handleDeleteRow(row.id)} className="w-full h-full flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors py-2"><Trash2 size={16} /></button>
-                   </div>
+
+                {/* 11. Delete */}
+                <td className="border border-[#8fabc7] p-0 align-middle print:hidden">
+                  <div className="flex items-center justify-center h-full w-full min-h-[25px]">
+                    <button
+                      onClick={() => handleDeleteRow(row.id)}
+                      className="w-full h-full flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors py-1"
+                      title="حذف الصف"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="bg-[#091526] text-white border border-[#091526] p-4 flex justify-between items-center mt-11 px-12 print:mt-auto">
-        <p className="font-bold text-sm">ساهر للخدمات الذكية</p>
-        <p className="font-bold text-sm font-sans tracking-wide">SAHER FOR SMART SERVICE</p>
       </div>
     </div>
   );
@@ -590,11 +803,17 @@ const INITIAL_RECIPIENT_ROWS: RecipientRow[] = Array.from({ length: 15 }, (_, i)
 const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.RECIPIENTS);
   const [dateStr, setDateStr] = useState<string>('');
+  const [enDateStr, setEnDateStr] = useState<string>('');
   const [activeRows, setActiveRows] = useState<ActiveCardRow[]>(INITIAL_ACTIVE_ROWS);
   const [recipientRows, setRecipientRows] = useState<RecipientRow[]>(INITIAL_RECIPIENT_ROWS);
   const [toast, setToast] = useState<Toast | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isInitialMount = useRef(true);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ id: Date.now(), message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -602,7 +821,6 @@ const App: React.FC = () => {
       const savedActive = localStorage.getItem('saaed-active-cards');
       if (savedActive) {
         const parsedActive = JSON.parse(savedActive);
-        // Add back null for attachment as File object cannot be stored
         const restoredActive = parsedActive.map((row: Omit<ActiveCardRow, 'attachment'>) => ({ ...row, attachment: null }));
         setActiveRows(restoredActive);
       }
@@ -617,7 +835,7 @@ const App: React.FC = () => {
       console.error("Failed to load data from localStorage", error);
       showToast("فشل تحميل البيانات المحفوظة", "error");
     }
-  }, []); // Empty array ensures this runs only once on mount
+  }, []);
 
   // Auto-save data on change
   useEffect(() => {
@@ -644,16 +862,20 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const date = new Date();
-    const formatter = new Intl.DateTimeFormat('ar-AE', {
+    const arFormatter = new Intl.DateTimeFormat('ar-AE', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     });
-    setDateStr(formatter.format(date));
+    const enFormatter = new Intl.DateTimeFormat('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+    setDateStr(arFormatter.format(date));
+    setEnDateStr(enFormatter.format(date));
   }, []);
 
   const validRecipientsCount = recipientRows.filter(r => r.recipientName.trim() !== '').length;
   const validActiveCardsCount = activeRows.filter(r => r.cardNumber.trim() !== '' || r.cardType.trim() !== '').length;
 
-  // --- Ticker Calculations ---
+  // --- Statistics Bar Calculations ---
   const validRecipients = recipientRows.filter(r => r.recipientName.trim() !== '');
   const latestRecipient = validRecipients.length > 0 
     ? [...validRecipients].sort((a, b) => b.id - a.id)[0] 
@@ -661,20 +883,52 @@ const App: React.FC = () => {
 
   const deptCounts: Record<string, number> = {};
   validRecipients.forEach(r => {
-    if(r.department && r.department.trim()) {
-       deptCounts[r.department] = (deptCounts[r.department] || 0) + 1;
+    if (r.department && r.department.trim()) {
+      deptCounts[r.department] = (deptCounts[r.department] || 0) + 1;
     }
   });
   const topDept = Object.entries(deptCounts).sort((a, b) => b[1] - a[1])[0];
 
-
-  const showToast = (message: string, type: 'success' | 'error') => {
-    setToast({ id: Date.now(), message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
   const handlePrint = () => {
     window.print();
+  };
+
+  // --- Add Row Logic (Toolbar Button) ---
+  const handleAddRowGlobal = () => {
+    if (currentTab === Tab.ACTIVE_CARDS) {
+      setActiveRows(prev => [
+        ...prev,
+        {
+          id: Date.now(),
+          cardType: '',
+          cardNumber: '',
+          cardCode: '',
+          attachment: null,
+          notes: ''
+        }
+      ]);
+      showToast('تم إضافة صف جديد بنجاح', 'success');
+    } else {
+      if (currentTab === Tab.DASHBOARD) {
+        setCurrentTab(Tab.RECIPIENTS);
+      }
+      setRecipientRows(prev => [
+        ...prev,
+        {
+          id: Date.now(),
+          recipientName: '',
+          department: '',
+          receiptDate: '',
+          cardType: '',
+          cardNumber: '',
+          cardCode: '',
+          duration: '',
+          attachment: null,
+          notes: ''
+        }
+      ]);
+      showToast('تم إضافة صف جديد بنجاح', 'success');
+    }
   };
   
   // --- Manual Save Logic ---
@@ -691,7 +945,6 @@ const App: React.FC = () => {
       showToast("حدث خطأ أثناء حفظ البيانات", "error");
     }
   };
-
 
   // --- Excel Export Logic ---
   const handleExport = () => {
@@ -717,7 +970,7 @@ const App: React.FC = () => {
           "الملاحظات": row.notes
         }));
 
-        wscols = [ { wch: 5 }, { wch: 35 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 50 }];
+        wscols = [{ wch: 5 }, { wch: 35 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 50 }];
 
       } else if (currentTab === Tab.ACTIVE_CARDS) {
         fileName = 'Active_Cards.xlsx';
@@ -732,15 +985,14 @@ const App: React.FC = () => {
           "الملاحظات": row.notes
         }));
 
-        wscols = [ { wch: 5 }, { wch: 30 }, { wch: 30 }, { wch: 25 }, { wch: 25 }, { wch: 60 }];
+        wscols = [{ wch: 5 }, { wch: 30 }, { wch: 30 }, { wch: 25 }, { wch: 25 }, { wch: 60 }];
       } else {
-        // Export Dashboard Data Summary
         fileName = 'Dashboard_Summary.xlsx';
-        const validRecipients = recipientRows.filter(r => r.recipientName.trim() !== '');
-        const validActiveCards = activeRows.filter(r => r.cardNumber.trim() !== '' || r.cardType.trim() !== '');
+        const validRec = recipientRows.filter(r => r.recipientName.trim() !== '');
+        const validAct = activeRows.filter(r => r.cardNumber.trim() !== '' || r.cardType.trim() !== '');
         dataToExport = [
-           { "الإحصائية": "إجمالي المستلمين", "القيمة": validRecipients.length },
-           { "الإحصائية": "البطاقات الفعالة", "القيمة": validActiveCards.length }
+          { "الإحصائية": "إجمالي المستلمين", "القيمة": validRec.length },
+          { "الإحصائية": "البطاقات الفعالة", "القيمة": validAct.length }
         ];
       }
 
@@ -784,7 +1036,7 @@ const App: React.FC = () => {
         const newRows: RecipientRow[] = data.map((row: any, index: number) => ({
           id: timestamp + index, 
           recipientName: row["اسم المستلم"] || '',
-          department: row["الادارة"] || '',
+          department: row["الادارة"] || row["الإدارة"] || '',
           receiptDate: row["تاريخ الاستلام"] || '',
           cardType: row["نوع البطاقة"] || '',
           cardNumber: row["رقم البطاقة"] ? String(row["رقم البطاقة"]) : '',
@@ -796,7 +1048,7 @@ const App: React.FC = () => {
         
         const finalRows = [...newRows];
         const rowsNeeded = Math.max(0, 15 - finalRows.length);
-        for(let i = 0; i < rowsNeeded; i++) finalRows.push({ ...INITIAL_RECIPIENT_ROWS[0], id: timestamp + newRows.length + i });
+        for (let i = 0; i < rowsNeeded; i++) finalRows.push({ ...INITIAL_RECIPIENT_ROWS[0], id: timestamp + newRows.length + i });
         setRecipientRows(finalRows);
         showToast('تم استيراد البيانات بنجاح', 'success');
       } else if (currentTab === Tab.ACTIVE_CARDS) {
@@ -811,7 +1063,7 @@ const App: React.FC = () => {
         
         const finalRows = [...newRows];
         const rowsNeeded = Math.max(0, 15 - finalRows.length);
-        for(let i = 0; i < rowsNeeded; i++) finalRows.push({ ...INITIAL_ACTIVE_ROWS[0], id: timestamp + newRows.length + i });
+        for (let i = 0; i < rowsNeeded; i++) finalRows.push({ ...INITIAL_ACTIVE_ROWS[0], id: timestamp + newRows.length + i });
         setActiveRows(finalRows);
         showToast('تم استيراد البيانات بنجاح', 'success');
       } else {
@@ -825,14 +1077,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 font-sans relative">
+    <div className="min-h-screen flex flex-col bg-[#eef2f6] font-sans relative">
       {/* Toast Notification */}
       {toast && (
-        <div className={`fixed bottom-8 left-8 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl animate-bounce-in border transition-all duration-300 ${toast.type === 'success' ? 'bg-[#091526] text-white border-green-500/50' : 'bg-red-900 text-white border-red-500/50'}`}>
-          {toast.type === 'success' ? <CheckCircle className="text-green-400" size={24} /> : <AlertCircle className="text-red-400" size={24} />}
+        <div className={`fixed bottom-8 left-8 z-[100] flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl border-2 transition-all duration-300 ${toast.type === 'success' ? 'bg-[#091526] text-white border-[#eab308]' : 'bg-red-950 text-white border-red-400'}`}>
+          {toast.type === 'success' ? <CheckCircle className="text-[#eab308]" size={24} /> : <AlertCircle className="text-red-400" size={24} />}
           <div className="flex flex-col">
-            <span className="font-bold text-sm">{toast.type === 'success' ? 'نجاح' : 'تنبيه'}</span>
-            <span className="text-sm text-gray-200">{toast.message}</span>
+            <span className="font-bold text-sm text-[#eab308]">{toast.type === 'success' ? 'نجاح' : 'تنبيه'}</span>
+            <span className="text-sm text-gray-100">{toast.message}</span>
           </div>
           <button onClick={() => setToast(null)} className="mr-4 text-gray-400 hover:text-white"><X size={16} /></button>
         </div>
@@ -864,171 +1116,363 @@ const App: React.FC = () => {
         `}</style>
       )}
 
-      {/* Animation Styles */}
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
-        .animate-marquee {
-          animation: marquee 60s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
+      {/* 1. HEADER — PIXEL-PRECISE MATCH TO REFERENCE */}
+      <header className="w-full bg-gradient-to-b from-[#041328] via-[#092140] to-[#061830] border-b-2 border-[#eab308] no-print relative overflow-hidden shadow-md">
+        {/* Decorative Diagonal Gold/Blue Ribbons */}
+        <img
+          src="/assets/header-ribbon-left.png"
+          alt=""
+          aria-hidden="true"
+          className="hidden lg:block absolute left-[17%] top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
+        />
+        <img
+          src="/assets/header-ribbon-right.png"
+          alt=""
+          aria-hidden="true"
+          className="hidden lg:block absolute right-[20%] top-0 h-full w-auto object-cover pointer-events-none select-none opacity-95"
+        />
 
-      {/* Main Page Header */}
-      <header className="w-full bg-[#091526] border-b-4 border-[#eab308] no-print relative shadow-md">
-        <div className="max-w-[98%] mx-auto flex flex-col md:flex-row items-center justify-between p-4 md:p-6 gap-6 relative">
-           <div className="flex flex-row items-center gap-5 md:gap-6 shrink-0 z-10">
-              <div className="relative w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#2563eb] to-[#1e40af] rounded-[1.5rem] flex items-center justify-center shadow-2xl border-t border-white/20 shrink-0">
-                  <span className="text-white text-4xl md:text-5xl font-black italic pr-1 font-sans drop-shadow-lg">S</span>
-                  <div className="absolute bottom-3 right-3 w-3 h-3 bg-[#d4af37] rounded-full shadow-[0_0_10px_rgba(251,191,36,0.8)]"></div>
-                  <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent rounded-t-[1.5rem]"></div>
+        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between px-4 md:px-6 py-2.5 gap-4 relative z-10 min-h-[86px]">
+          {/* Right Side (in RTL): Original SAHER Logo */}
+          <div className="flex flex-row items-center gap-3.5 shrink-0 z-10">
+            <div className="relative w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-[#3b76f6] to-[#1d4ed8] rounded-2xl flex items-center justify-center shadow-xl border border-white/20 shrink-0">
+              <span className="text-white text-3xl md:text-4xl font-black italic pr-1 font-sans drop-shadow-md">S</span>
+              <div className="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 bg-[#eab308] rounded-full shadow-[0_0_8px_rgba(250,204,21,0.9)]"></div>
+              <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/15 to-transparent rounded-t-2xl"></div>
+            </div>
+            <div className="flex flex-col items-end text-left" dir="ltr">
+              <h1 className="text-2xl md:text-3xl font-black text-white tracking-wider drop-shadow-md leading-none font-sans">SAHER</h1>
+              <span className="text-gray-200 text-[9px] md:text-[10px] font-bold tracking-[0.22em] uppercase whitespace-nowrap mt-1 font-sans">
+                FOR SMART SERVICE
+              </span>
+            </div>
+          </div>
+
+          {/* Center: Department Pill + Arabic Title + English Subtitle */}
+          <div className="flex flex-col items-center text-center z-10">
+            <div className="inline-flex items-center justify-center bg-[#081d38]/90 border border-[#eab308]/70 rounded-full px-5 py-0.5 shadow-sm mb-1">
+              <h2 className="text-[#facc15] text-xs md:text-sm font-bold tracking-wide">
+                إدارة الخدمات العامة / قسم إدارة المرافق
+              </h2>
+            </div>
+            <p className="text-white text-lg md:text-2xl font-extrabold tracking-wide drop-shadow">
+              نظام تسجيل أسماء المستلمين لبطاقات الزوار
+            </p>
+            <p className="text-gray-200 text-xs md:text-sm font-medium tracking-wide font-sans mt-0.5">
+              Visitor Card Recipient Registration System
+            </p>
+          </div>
+
+          {/* Left Side (in RTL): Bilingual Date & Calendar Box */}
+          <div className="flex items-center shrink-0 z-10">
+            <div className="flex items-center gap-3 bg-[#06172d]/90 px-4 py-2 rounded-xl border border-[#eab308]/50 shadow-inner">
+              <CalendarDays size={28} className="text-[#eab308] shrink-0" />
+              <div className="flex flex-col text-left" dir="ltr">
+                <span className="text-white text-xs md:text-sm font-bold text-right" dir="rtl">{dateStr}</span>
+                <span className="text-gray-300 text-[11px] font-medium font-sans">{enDateStr}</span>
               </div>
-              <div className="flex flex-col items-start">
-                <h1 className="text-2xl md:text-4xl font-black text-white tracking-widest drop-shadow-xl leading-none" style={{fontFamily: 'sans-serif'}}>SAHER</h1>
-                <div className="flex items-center gap-2 mt-2 w-full">
-                  <span className="text-white/90 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase whitespace-nowrap">FOR SMART SERVICE</span>
-                  <div className="flex-grow h-1 bg-[#d4af37] rounded-full shadow-lg opacity-80"></div>
-                </div>
-              </div>
-           </div>
-           <div className="flex flex-col items-center text-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full md:w-auto z-0 order-3 md:order-2 mt-4 md:mt-0">
-                <h2 className="text-[#eab308] text-sm md:text-base font-bold mb-1 tracking-wide bg-blue-900/30 px-4 py-1 rounded-full border border-blue-500/20 backdrop-blur-sm">إدارة الخدمات العامة / قسم إدارة المرافق</h2>
-                <p className="text-white text-lg md:text-2xl font-semibold tracking-wide drop-shadow-md mt-2">نظام تسجيل أسماء المستلمين لبطاقات الزوار</p>
-           </div>
-           <div className="flex items-center justify-end md:justify-start shrink-0 z-10 order-2 md:order-3 w-full md:w-auto">
-             <div className="flex items-center gap-3 text-gray-400 bg-white/5 px-4 py-2 rounded-lg border border-white/10 mx-auto md:mx-0">
-                <CalendarDays size={42} className="text-[#eab308]" />
-                <span className="text-sm font-bold">{dateStr}</span>
-             </div>
-           </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Breaking News / Statistics Ticker Bar */}
-      <div className="w-full bg-[#1e293b] text-white border-y border-[#eab308]/50 shadow-lg overflow-hidden no-print mt-8 mb-2">
-          <div className="flex items-center h-12 w-full max-w-[98%] mx-auto">
-             {/* Ticker Label */}
-             <div className="bg-[#eab308] text-[#091526] h-full flex items-center px-6 font-black text-sm md:text-base shrink-0 z-20 shadow-lg relative clip-path-slant-r">
-               <Bell className="ml-2 animate-pulse" size={20} />
-               <span>آخر المستجدات</span>
-               {/* Decorative slanted edge effect using CSS clip-path or absolute div could be added here, sticking to simple background for now */}
-               <div className="absolute left-0 top-0 bottom-0 w-4 bg-[#eab308] skew-x-12 -ml-2 -z-10"></div>
-             </div>
+      {/* 2. HERO IMAGE — MANDATORY VISUAL MATCH */}
+      <section className="w-full bg-[#061830] border-b-2 border-[#eab308]/80 no-print overflow-hidden">
+        <div className="max-w-[1448px] mx-auto w-full">
+          <img
+            src="/assets/hero-reception.png"
+            alt="مكتب الاستقبال وإدارة الزوار - SAHER"
+            className="w-full h-auto block object-cover select-none"
+          />
+        </div>
+      </section>
 
-             {/* Marquee Content */}
-             <div className="flex-1 flex items-center overflow-hidden relative h-full bg-[#0f2038]">
-               <div className="whitespace-nowrap animate-marquee flex items-center gap-12 px-4 text-sm font-medium text-gray-200">
-                  <span className="flex items-center gap-2 text-white"><Users size={16} className="text-blue-400"/> إجمالي المستلمين: <span className="font-bold text-[#eab308] text-lg">{validRecipientsCount}</span></span>
-                  <span className="text-gray-600">|</span>
-                  <span className="flex items-center gap-2 text-white"><IdCard size={16} className="text-emerald-400"/> البطاقات الفعالة: <span className="font-bold text-[#eab308] text-lg">{validActiveCardsCount}</span></span>
-                  <span className="text-gray-600">|</span>
-                  <span className="flex items-center gap-2 text-white"><Timer size={16} className="text-orange-400"/> آخر مستلم: <span className="font-bold text-white">{latestRecipient ? `${latestRecipient.recipientName} (${latestRecipient.receiptDate || 'بدون تاريخ'})` : 'لا يوجد سجلات'}</span></span>
-                  <span className="text-gray-600">|</span>
-                  <span className="flex items-center gap-2 text-white"><Trophy size={16} className="text-purple-400"/> الإدارة الأكثر طلباً: <span className="font-bold text-white">{topDept ? `${topDept[0]} (${topDept[1]})` : '-'}</span></span>
-                  
-                  {/* Duplicate content for seamless loop */}
-                  <span className="text-gray-600 mx-8">***</span>
-                  
-                  <span className="flex items-center gap-2 text-white"><Users size={16} className="text-blue-400"/> إجمالي المستلمين: <span className="font-bold text-[#eab308] text-lg">{validRecipientsCount}</span></span>
-                  <span className="text-gray-600">|</span>
-                  <span className="flex items-center gap-2 text-white"><IdCard size={16} className="text-emerald-400"/> البطاقات الفعالة: <span className="font-bold text-[#eab308] text-lg">{validActiveCardsCount}</span></span>
-                  <span className="text-gray-600">|</span>
-                  <span className="flex items-center gap-2 text-white"><Timer size={16} className="text-orange-400"/> آخر مستلم: <span className="font-bold text-white">{latestRecipient ? `${latestRecipient.recipientName} (${latestRecipient.receiptDate || 'بدون تاريخ'})` : 'لا يوجد سجلات'}</span></span>
-                  <span className="text-gray-600">|</span>
-                  <span className="flex items-center gap-2 text-white"><Trophy size={16} className="text-purple-400"/> الإدارة الأكثر طلباً: <span className="font-bold text-white">{topDept ? `${topDept[0]} (${topDept[1]})` : '-'}</span></span>
-               </div>
-             </div>
+      {/* 3. NEWS & KPI STATISTICS BAR BELOW HERO */}
+      <section className="w-full bg-gradient-to-b from-[#071c36] to-[#041122] py-2 px-4 border-b border-[#1c3b61] shadow-md no-print">
+        <div className="max-w-[1400px] mx-auto bg-gradient-to-r from-[#081f3c] via-[#0c294d] to-[#081f3c] border border-[#2d527c] rounded-xl px-3 py-2 shadow-inner">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x sm:divide-x-reverse divide-[#23456b] items-center">
+            
+            {/* Stat 1: Total Recipients */}
+            <div className="flex items-center justify-between px-4 py-1">
+              <div className="flex items-center gap-3">
+                <Users size={26} className="text-[#eab308] shrink-0" />
+                <div className="flex flex-col text-right">
+                  <span className="text-white font-bold text-xs md:text-sm leading-tight">إجمالي المستلمين</span>
+                  <span className="text-gray-300 text-[10px] font-sans leading-tight">Total Recipients</span>
+                </div>
+              </div>
+              <span className="text-[#facc15] font-black text-xl md:text-2xl tabular-nums">{validRecipientsCount}</span>
+            </div>
+
+            {/* Stat 2: Active Cards */}
+            <div className="flex items-center justify-between px-4 py-1">
+              <div className="flex items-center gap-3">
+                <IdCard size={26} className="text-[#eab308] shrink-0" />
+                <div className="flex flex-col text-right">
+                  <span className="text-white font-bold text-xs md:text-sm leading-tight">البطاقات الفعالة</span>
+                  <span className="text-gray-300 text-[10px] font-sans leading-tight">Active Cards</span>
+                </div>
+              </div>
+              <span className="text-[#facc15] font-black text-xl md:text-2xl tabular-nums">{validActiveCardsCount}</span>
+            </div>
+
+            {/* Stat 3: Last Recipient */}
+            <div className="flex items-center justify-between px-4 py-1">
+              <div className="flex items-center gap-2.5">
+                <User size={24} className="text-[#eab308] shrink-0" />
+                <div className="flex flex-col text-right">
+                  <span className="text-white font-bold text-xs md:text-sm leading-tight">آخر مستلم</span>
+                  <span className="text-gray-300 text-[10px] font-sans leading-tight">Last Recipient</span>
+                </div>
+              </div>
+              <div className="flex flex-col text-center">
+                <span className="text-[#facc15] font-bold text-xs md:text-sm leading-tight truncate max-w-[110px]">
+                  {latestRecipient ? latestRecipient.recipientName : 'لا يوجد'}
+                </span>
+                <span className="text-gray-300 text-[10px] font-sans leading-tight">
+                  {latestRecipient ? (latestRecipient.receiptDate || 'مسجل') : 'Not Available'}
+                </span>
+              </div>
+            </div>
+
+            {/* Stat 4: Most Requested Department */}
+            <div className="flex items-center justify-between px-4 py-1">
+              <div className="flex items-center gap-2.5">
+                <Building2 size={24} className="text-[#eab308] shrink-0" />
+                <div className="flex flex-col text-right">
+                  <span className="text-white font-bold text-xs md:text-sm leading-tight">الإدارة الأكثر طلباً</span>
+                  <span className="text-gray-300 text-[10px] font-sans leading-tight">Most Requested Department</span>
+                </div>
+              </div>
+              <span className="text-[#facc15] font-bold text-xs md:text-sm truncate max-w-[100px]">
+                {topDept ? `${topDept[0]} (${topDept[1]})` : '-'}
+              </span>
+            </div>
+
+            {/* Stat 5: Latest Updates */}
+            <div className="flex items-center justify-between px-4 py-1">
+              <div className="flex items-center gap-2.5">
+                <Bell size={24} className="text-[#eab308] shrink-0" />
+                <div className="flex flex-col text-right">
+                  <span className="text-white font-bold text-xs md:text-sm leading-tight">آخر المستجدات</span>
+                  <span className="text-gray-300 text-[10px] font-sans leading-tight">Latest Updates</span>
+                </div>
+              </div>
+              <div className="flex flex-col text-center">
+                <span className="text-[#facc15] font-bold text-xs md:text-sm leading-tight">
+                  {validRecipientsCount + validActiveCardsCount > 0 ? `${validRecipientsCount + validActiveCardsCount} سجل` : 'لا يوجد'}
+                </span>
+                <span className="text-gray-300 text-[10px] font-sans leading-tight">
+                  {validRecipientsCount + validActiveCardsCount > 0 ? 'Active Records' : 'No Updates'}
+                </span>
+              </div>
+            </div>
+
           </div>
         </div>
+      </section>
 
-      {/* Navigation Toolbar */}
-      <nav className="w-full bg-white/80 backdrop-blur-md shadow-sm p-4 mb-8 no-print sticky top-0 z-50 border-b border-gray-200">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="relative grid grid-cols-3 bg-gray-200/80 p-1.5 rounded-xl border border-gray-300/50 shadow-inner w-full md:w-auto min-w-[320px] md:min-w-[480px]">
-            <div 
-              className="absolute top-1.5 bottom-1.5 rounded-lg bg-[#091526] shadow-[0_2px_15px_-3px_rgba(9,21,38,0.4)] border border-[#eab308]/30 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0" 
-              style={{ 
-                width: 'calc(33.33% - 6px)', 
-                right: currentTab === Tab.RECIPIENTS ? '6px' : currentTab === Tab.ACTIVE_CARDS ? 'calc(33.33% + 2px)' : 'calc(66.66% - 2px)'
-              }}
+      {/* 4. NAVIGATION TABS BAR */}
+      <div className="w-full bg-[#e6edf5] border-b border-[#c5d3e2] py-2 px-4 no-print">
+        <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-start gap-2.5">
+          {/* Tab 1: Recipients */}
+          <button
+            onClick={() => setCurrentTab(Tab.RECIPIENTS)}
+            className={`flex items-center justify-center gap-2.5 px-7 py-2 rounded-xl font-bold text-sm md:text-base transition-all duration-200 whitespace-nowrap shrink-0 ${
+              currentTab === Tab.RECIPIENTS
+                ? 'bg-gradient-to-b from-[#0d2847] to-[#061527] text-white border-2 border-[#eab308] shadow-md'
+                : 'bg-gradient-to-b from-[#dbe4ef] to-[#c7d4e4] text-[#091526] border border-[#aebfd4] hover:from-[#e4ecf5] hover:to-[#d1deed]'
+            }`}
+          >
+            <ClipboardList size={19} className={currentTab === Tab.RECIPIENTS ? 'text-[#eab308]' : 'text-[#1e3a5f]'} />
+            <span>سجل المستلمين ({validRecipientsCount})</span>
+          </button>
+
+          {/* Tab 2: Active Cards */}
+          <button
+            onClick={() => setCurrentTab(Tab.ACTIVE_CARDS)}
+            className={`flex items-center justify-center gap-2.5 px-7 py-2 rounded-xl font-bold text-sm md:text-base transition-all duration-200 whitespace-nowrap shrink-0 ${
+              currentTab === Tab.ACTIVE_CARDS
+                ? 'bg-gradient-to-b from-[#0d2847] to-[#061527] text-white border-2 border-[#eab308] shadow-md'
+                : 'bg-gradient-to-b from-[#dbe4ef] to-[#c7d4e4] text-[#091526] border border-[#aebfd4] hover:from-[#e4ecf5] hover:to-[#d1deed]'
+            }`}
+          >
+            <IdCard size={19} className={currentTab === Tab.ACTIVE_CARDS ? 'text-[#eab308]' : 'text-[#1e3a5f]'} />
+            <span>البطاقات الفعالة ({validActiveCardsCount})</span>
+          </button>
+
+          {/* Tab 3: Dashboard */}
+          <button
+            onClick={() => setCurrentTab(Tab.DASHBOARD)}
+            className={`flex items-center justify-center gap-2.5 px-7 py-2 rounded-xl font-bold text-sm md:text-base transition-all duration-200 whitespace-nowrap shrink-0 ${
+              currentTab === Tab.DASHBOARD
+                ? 'bg-gradient-to-b from-[#0d2847] to-[#061527] text-white border-2 border-[#eab308] shadow-md'
+                : 'bg-gradient-to-b from-[#233d5a] to-[#152840] text-white border border-[#385473] hover:from-[#2b496b] hover:to-[#1b324e]'
+            }`}
+          >
+            <BarChart3 size={19} className={currentTab === Tab.DASHBOARD ? 'text-[#eab308]' : 'text-blue-200'} />
+            <span>لوحة المعلومات ({validRecipientsCount})</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 5. ACTION BUTTONS TOOLBAR ROW */}
+      <div className="w-full bg-[#f5f8fb] border-b border-gray-200 py-2 px-4 no-print shadow-sm">
+        <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-3">
+          {/* Right Action Buttons: Add Row + Save Changes */}
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={handleAddRowGlobal}
+              className="flex items-center justify-center gap-2 bg-gradient-to-b from-[#174680] to-[#0c294d] hover:from-[#1d5496] hover:to-[#103562] text-white px-5 py-2 rounded-xl border border-[#2e619e] shadow-sm font-bold text-xs md:text-sm transition-all active:scale-95 whitespace-nowrap shrink-0"
             >
-               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg"></div>
-            </div>
-            
-            <button onClick={() => setCurrentTab(Tab.RECIPIENTS)} className={`relative z-10 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-300 font-bold text-sm md:text-base ${currentTab === Tab.RECIPIENTS ? 'text-white scale-105' : 'text-gray-600 hover:text-[#091526]'}`}>
-              <ClipboardList size={20} className={`transition-colors duration-300 ${currentTab === Tab.RECIPIENTS ? "text-[#eab308]" : "text-gray-500"}`} />
-              <span>سجل المستلمين ({validRecipientsCount})</span>
+              <Plus size={17} className="text-white" />
+              <span>إضافة صف جديد</span>
             </button>
-            <button onClick={() => setCurrentTab(Tab.ACTIVE_CARDS)} className={`relative z-10 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-300 font-bold text-sm md:text-base ${currentTab === Tab.ACTIVE_CARDS ? 'text-white scale-105' : 'text-gray-600 hover:text-[#091526]'}`}>
-              <IdCard size={20} className={`transition-colors duration-300 ${currentTab === Tab.ACTIVE_CARDS ? "text-[#eab308]" : "text-gray-500"}`} />
-              <span>البطاقات الفعالة ({validActiveCardsCount})</span>
-            </button>
-            <button onClick={() => setCurrentTab(Tab.DASHBOARD)} className={`relative z-10 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg transition-all duration-300 font-bold text-sm md:text-base ${currentTab === Tab.DASHBOARD ? 'text-white scale-105' : 'text-gray-600 hover:text-[#091526]'}`}>
-              <LayoutDashboard size={20} className={`transition-colors duration-300 ${currentTab === Tab.DASHBOARD ? "text-[#eab308]" : "text-gray-500"}`} />
-              <span>لوحة المعلومات ({validRecipientsCount})</span>
+
+            <button
+              onClick={handleSave}
+              className="flex items-center justify-center gap-2 bg-gradient-to-b from-[#112c4e] to-[#08182b] hover:from-[#183a63] hover:to-[#0c223d] text-[#facc15] px-5 py-2 rounded-xl border-2 border-[#eab308] shadow-sm font-bold text-xs md:text-sm transition-all active:scale-95 whitespace-nowrap shrink-0"
+            >
+              <Save size={16} className="text-[#eab308]" />
+              <span>حفظ التغييرات</span>
             </button>
           </div>
 
+          {/* Left Action Buttons: Import + Export + Print */}
           <div className="flex items-center gap-2">
             <input type="file" ref={fileInputRef} onChange={handleFileImport} className="hidden" accept=".xlsx, .xls" />
             
-            <button onClick={triggerImport} className="flex flex-row-reverse items-center justify-center gap-2 bg-[#091526] text-white px-5 py-2.5 rounded-lg hover:bg-[#0f2038] transition-all shadow-md hover:shadow-lg active:scale-95 border border-blue-900/50" title="استيراد من Excel">
-              <Upload size={18} /><span>استيراد</span>
+            <button
+              onClick={triggerImport}
+              className="flex items-center justify-center gap-2 bg-gradient-to-b from-[#11263f] to-[#081526] hover:from-[#193556] hover:to-[#0d2038] text-white px-5 py-2 rounded-xl border border-[#2a4768] shadow-sm font-bold text-xs md:text-sm transition-all active:scale-95 whitespace-nowrap shrink-0"
+              title="استيراد من Excel"
+            >
+              <span>استيراد</span>
+              <Upload size={15} className="text-gray-200" />
             </button>
-            <button onClick={handleExport} className="flex flex-row-reverse items-center justify-center gap-2 bg-[#091526] text-white px-5 py-2.5 rounded-lg hover:bg-[#0f2038] transition-all shadow-md hover:shadow-lg active:scale-95 border border-blue-900/50" title="تصدير إلى Excel">
-              <Download size={18} /><span>تصدير</span>
+
+            <button
+              onClick={handleExport}
+              className="flex items-center justify-center gap-2 bg-gradient-to-b from-[#11263f] to-[#081526] hover:from-[#193556] hover:to-[#0d2038] text-white px-5 py-2 rounded-xl border border-[#2a4768] shadow-sm font-bold text-xs md:text-sm transition-all active:scale-95 whitespace-nowrap shrink-0"
+              title="تصدير إلى Excel"
+            >
+              <span>تصدير</span>
+              <Download size={15} className="text-gray-200" />
             </button>
-            <button onClick={handlePrint} className="flex flex-row-reverse items-center justify-center gap-2 bg-[#091526] text-white px-6 py-2.5 rounded-lg hover:bg-[#0f2038] transition-all shadow-md hover:shadow-lg active:scale-95 border border-blue-900/50">
-              <Printer size={18} /><span>طباعة</span>
+
+            <button
+              onClick={handlePrint}
+              className="flex items-center justify-center gap-2 bg-gradient-to-b from-[#11263f] to-[#081526] hover:from-[#193556] hover:to-[#0d2038] text-white px-5 py-2 rounded-xl border border-[#2a4768] shadow-sm font-bold text-xs md:text-sm transition-all active:scale-95 whitespace-nowrap shrink-0"
+            >
+              <span>طباعة</span>
+              <Printer size={15} className="text-gray-200" />
             </button>
           </div>
         </div>
-      </nav>
+      </div>
 
-      {/* Main Content Area */}
-      <main className="w-full flex justify-center px-4 flex-grow print:px-0 print:w-full">
+      {/* 6. MAIN CONTENT AREA */}
+      <main className="w-full flex justify-center px-3 py-2 flex-grow print:px-0 print:py-0 print:w-full">
         {currentTab === Tab.DASHBOARD ? (
           <Dashboard activeRows={activeRows} recipientRows={recipientRows} />
         ) : currentTab === Tab.ACTIVE_CARDS ? (
           <ActiveCardsPage rows={activeRows} setRows={setActiveRows} onShowToast={showToast} onSave={handleSave} />
         ) : (
           <div className="overflow-x-auto print:overflow-visible w-full flex justify-center">
-             <RecipientsPage rows={recipientRows} setRows={setRecipientRows} onShowToast={showToast} onSave={handleSave} />
+            <RecipientsPage rows={recipientRows} setRows={setRecipientRows} onShowToast={showToast} onSave={handleSave} />
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#091526] text-white pt-8 pb-6 mt-auto no-print border-t-4 border-[#eab308]">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 mb-6">
-          <div>
-            <h3 className="text-xl font-bold mb-4 text-white border-b-2 border-yellow-400 pb-2 w-fit">عن SAHER</h3>
-            <p className="text-gray-300 leading-relaxed text-sm">شركة رائدة في تقديم الحلول والأنظمة الذكية، ملتزمون بالابتكار والجودة لتحقيق أعلى مستويات الكفاءة والخدمات الذكية.</p>
+      {/* 7. INSTITUTIONAL FOOTER — EXACT VISUAL REFERENCE */}
+      <footer className="bg-gradient-to-b from-[#071f3b] to-[#041122] text-white pt-5 pb-3 mt-auto no-print border-t-[3px] border-[#eab308]">
+        <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center mb-3">
+          {/* Column 1 (Right, 3 cols): About SAHER */}
+          <div className="md:col-span-3 text-right">
+            <h3 className="text-sm md:text-base font-bold mb-2 text-white border-b-2 border-[#eab308] pb-1 w-fit">
+              عن SAHER
+            </h3>
+            <p className="text-gray-200 leading-relaxed text-xs">
+              شركة رائدة في تقديم الحلول والأنظمة الذكية، ملتزمون بالابتكار والجودة لتحقيق أعلى مستويات الكفاءة والخدمات الذكية.
+            </p>
           </div>
-          <div>
-            <h3 className="text-xl font-bold mb-4 text-white border-b-2 border-yellow-400 pb-2 w-fit">روابط سريعة</h3>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer group"><ChevronLeft size={16} className="text-blue-500 group-hover:-translate-x-1 transition-transform" /><span>الرئيسية</span></li>
-              <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer group"><ChevronLeft size={16} className="text-blue-500 group-hover:-translate-x-1 transition-transform" /><span>خدماتنا</span></li>
-              <li className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer group"><ChevronLeft size={16} className="text-blue-500 group-hover:-translate-x-1 transition-transform" /><span>تواصل معنا</span></li>
+
+          {/* Column 2 (2 cols): Quick Links */}
+          <div className="md:col-span-2 text-right">
+            <h3 className="text-sm md:text-base font-bold mb-2 text-white border-b-2 border-[#eab308] pb-1 w-fit">
+              روابط سريعة
+            </h3>
+            <ul className="space-y-1.5 text-xs text-gray-200">
+              <li onClick={() => setCurrentTab(Tab.RECIPIENTS)} className="flex items-center gap-1.5 hover:text-[#eab308] transition-colors cursor-pointer group">
+                <ChevronLeft size={14} className="text-[#eab308] group-hover:-translate-x-1 transition-transform" />
+                <span>الرئيسية</span>
+              </li>
+              <li onClick={() => setCurrentTab(Tab.ACTIVE_CARDS)} className="flex items-center gap-1.5 hover:text-[#eab308] transition-colors cursor-pointer group">
+                <ChevronLeft size={14} className="text-[#eab308] group-hover:-translate-x-1 transition-transform" />
+                <span>خدماتنا</span>
+              </li>
+              <li onClick={() => setCurrentTab(Tab.DASHBOARD)} className="flex items-center gap-1.5 hover:text-[#eab308] transition-colors cursor-pointer group">
+                <ChevronLeft size={14} className="text-[#eab308] group-hover:-translate-x-1 transition-transform" />
+                <span>تواصل معنا</span>
+              </li>
             </ul>
           </div>
-          <div>
-            <h3 className="text-xl font-bold mb-4 text-white border-b-2 border-yellow-400 pb-2 w-fit">تواصل معنا</h3>
-            <ul className="space-y-4 text-sm text-gray-300">
-              <li className="flex items-start gap-3"><MapPin size={20} className="text-blue-400 mt-1 shrink-0" /><span dir="ltr" className="text-right">Level 3, Baynona Building, Khalif City A</span></li>
-              <li className="flex items-center gap-3"><Phone size={20} className="text-blue-400 shrink-0" /><span dir="ltr">+971 4 123 4567</span></li>
-              <li className="flex items-center gap-3"><Mail size={20} className="text-blue-400 shrink-0" /><span>Logistic@saher.ae</span></li>
+
+          {/* Column 3 (3 cols): Contact Us */}
+          <div className="md:col-span-3 text-right">
+            <h3 className="text-sm md:text-base font-bold mb-2 text-white border-b-2 border-[#eab308] pb-1 w-fit">
+              تواصل معنا
+            </h3>
+            <ul className="space-y-2 text-xs text-gray-200">
+              <li className="flex items-center gap-2.5">
+                <MapPin size={15} className="text-[#eab308] shrink-0" />
+                <span dir="ltr" className="text-right font-sans">Level 3, Baynona Building, Khalif City A</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone size={15} className="text-[#eab308] shrink-0" />
+                <span dir="ltr" className="font-sans tabular-nums">+971 4 123 4567</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Mail size={15} className="text-[#eab308] shrink-0" />
+                <span className="font-sans">Logistic@saher.ae</span>
+              </li>
             </ul>
+          </div>
+
+          {/* Column 4 (Left, 4 cols): UAE Skyline Illustration + SAHER Brand Lockup */}
+          <div className="md:col-span-4 flex items-center justify-end gap-4" dir="ltr">
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="relative w-12 h-12 bg-gradient-to-br from-[#3b76f6] to-[#1d4ed8] rounded-xl flex items-center justify-center shadow-lg border border-white/20 shrink-0">
+                <span className="text-white text-2xl font-black italic pr-0.5 font-sans">S</span>
+                <div className="absolute bottom-2 right-2 w-2 h-2 bg-[#eab308] rounded-full"></div>
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-2xl font-black text-white tracking-wider leading-none font-sans">SAHER</span>
+                <span className="text-gray-300 text-[8px] font-bold tracking-[0.2em] uppercase mt-1 font-sans">
+                  FOR SMART SERVICE
+                </span>
+              </div>
+            </div>
+            <img
+              src="/assets/footer-skyline.png"
+              alt=""
+              aria-hidden="true"
+              className="hidden sm:block h-20 w-auto object-contain opacity-95 pointer-events-none select-none"
+            />
           </div>
         </div>
-        <div className="max-w-6xl mx-auto px-6 pt-6 border-t border-white/10 flex flex-col items-center gap-4 text-xs text-gray-400">
-           <div className="flex items-center gap-1 bg-white/5 px-3 py-1 rounded-full border border-white/10"><span>اعداد وتصميم /</span><span className="text-blue-300 font-bold">خالد الجفري</span></div>
-           <p className="text-center">جميع الحقوق محفوظة لشركة © {new Date().getFullYear()} SAHER FOR SMART SERVICE</p>
+
+        {/* Bottom Bar: Designer Badge & Copyright */}
+        <div className="max-w-[1400px] mx-auto px-6 pt-2.5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-300">
+          <div className="flex items-center gap-1.5 bg-[#091e38] px-3.5 py-1 rounded-full border border-white/15 shadow-sm">
+            <Settings size={13} className="text-[#eab308]" />
+            <span>إعداد وتصميم /</span>
+            <span className="text-white font-bold">خالد الهاشمي</span>
+          </div>
+          <p className="text-center font-medium">
+            جميع الحقوق محفوظة لشركة © {new Date().getFullYear()} SAHER FOR SMART SERVICE
+          </p>
+          <div className="hidden sm:block w-36"></div>
         </div>
       </footer>
     </div>
