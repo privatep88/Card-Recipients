@@ -276,10 +276,8 @@ const ActiveCardsPage: React.FC<ActiveCardsPageProps> = ({ rows, setRows, onShow
   };
 
   const handleDeleteRow = (id: number) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا الصف؟')) {
-      setRows(prev => prev.filter(row => row.id !== id));
-      onShowToast('تم حذف الصف بنجاح', 'error');
-    }
+    setRows(prev => prev.filter(row => row.id !== id));
+    onShowToast('تم حذف الصف بنجاح', 'error');
   };
 
   const getFileIcon = (file: File) => {
@@ -435,10 +433,8 @@ const RecipientsPage: React.FC<RecipientsPageProps> = ({ rows, setRows, onShowTo
   };
 
   const handleDeleteRow = (id: number) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا الصف؟')) {
-      setRows(prev => prev.filter(row => row.id !== id));
-      onShowToast('تم حذف الصف بنجاح', 'error');
-    }
+    setRows(prev => prev.filter(row => row.id !== id));
+    onShowToast('تم حذف الصف بنجاح', 'error');
   };
 
   const getFileIcon = (file: File) => {
